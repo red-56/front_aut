@@ -1,22 +1,37 @@
-import DashboardLayout from "@/pages/Layout/DashboardLayout.vue";
-
 import Router from 'vue-router';
 import Vue from 'vue';
 
-import Dashboard from "@/pages/Dashboard.vue";
+// IMPORT COMPONENTS
+/*import DashboardLayout from "@/pages/Layout/DashboardLayout.vue";
 import UserProfile from "@/pages/UserProfile.vue";
 import TimeManager from "@/pages/TimeManager.vue";
 import TeamGraph from "@/pages/TeamGraph.vue";
 import UserGraph from "@/pages/UserGraph.vue";
 import UserManager from "@/pages/UserManager.vue";
-import Login from "@/components/Login.vue";
-import SignUp from "@/components/SignUp.vue";
+import store from "@/store/store.js";*/
 
-import store from "@/store/store.js";
+import Login from "@/components/Authentication/Login.vue";
+import SignUp from "@/components/Authentication/SignUp.vue";
 
 Vue.use(Router);
 
-let router = new Router({
+export default new Router({
+
+  routes: [
+    {
+      path: '/login',
+      name: "Login",
+      component: Login
+    },
+    {
+      path: "/signup",
+      name: "SignUp",
+      component: SignUp
+    },
+  ]
+})
+
+/*let router = new Router({
   mode: 'history',
   routes: [
     {
@@ -73,9 +88,9 @@ let router = new Router({
 
     ]
   }
-]});
+]});*/
 
-router.beforeEach((to, from, next) => {
+/*router.beforeEach((to, from, next) => {
   if(to.matched.some(record => record.meta.requiresAuth)) {
     if (store.getters.isLoggedIn) {
       next()
@@ -85,6 +100,5 @@ router.beforeEach((to, from, next) => {
   } else {
     next() 
   }
-});
+});*/
 
-export default router;

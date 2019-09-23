@@ -1,42 +1,19 @@
 import Vue from "vue";
-import VueRouter from "vue-router";
 import App from "./App";
+import router from './router';
+import BootstrapVue from 'bootstrap-vue';
 
-// router setup
-import routes from "./routes/routes";
+Vue.use(BootstrapVue);
 
-// Plugins
-import GlobalDirectives from "./globalDirectives";
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
 
-// MaterialDashboard plugin
-import MaterialDashboard from "./material-dashboard";
-
-import Chartist from "chartist";
-
-import * as am4core from "@amcharts/amcharts4/core";
-// import * as am4charts from "@amcharts/amcharts4/charts";
-import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-
-am4core.useTheme(am4themes_animated);
-
-// configure router
-const router = new VueRouter({
-  routes, // short for routes: routes
-  linkExactActiveClass: "nav-item active"
-});
-
-Vue.prototype.$Chartist = Chartist;
-
-Vue.use(VueRouter);
-Vue.use(MaterialDashboard);
-Vue.use(GlobalDirectives);
-
+Vue.config.productionTip = false
 
 new Vue({
   el: "#app",
-  render: h => h(App),
   router,
-  data: {
-    Chartist: Chartist
-  }
+  template: '<App/>',
+  components: { App },
+  render: h => h(App),
 });

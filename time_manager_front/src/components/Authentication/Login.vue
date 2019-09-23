@@ -19,33 +19,57 @@
   </form>
   </div>
 </template>
+
 <script>
 
-
-
 import { mdbInput, mdbBtn } from "mdbvue";
+import axios from 'axios';
+import Swal from 'sweetalert2';
+
 export default {
-  name: "Basic",
+
+  name: "Login",
+
   components: {
     mdbInput,
     mdbBtn
   },
+
   data () {
+
     return {
       email: '',
-      password: ''
+      password: '',
+      token: '',
+      users: [],
+      errors: []
     }
+    
   },
-   methods: {
-      login: function () {
-        let email = this.email 
-        let password = this.password
-        this.$store.dispatch('login', { email, password })
-       .then(() => this.$router.push('/'))
-       .catch(err => console.log(err))
-      }
-    } 
+
+  methods: {
+
+    login() {
+      axios.post('http://localhost:3000/api/users/sign_in', {email: this.email, password: this.password})
+      .then((token) => {
+        console.log(token.data);
+        localStorage.setItem('token', token.data.token);
+      })
+      .catch((error) => {
+        Swal.fire({
+          type: 'error',
+          title: 'Erreur',
+          text: 'Email ou mot de passe incorrect(s)',
+          footer: 'Veuillez saisir les bons identifiants'
+        });
+      });
+    }
+
+    
+  } 
+
 };
+
 </script>
  
  <style scoped>
