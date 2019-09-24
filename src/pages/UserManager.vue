@@ -1,31 +1,27 @@
 <template>
     <div>
-        <!--<b-pagination v-model="currentPage" :total-rows="total" :per-page="perPage" aria-controls="my-users"></b-pagination>
-        <b-table striped hover :items="users" :per-page="perPage" id="my-users" :current-page="currentPage" responsive="sm">
-            
-        </b-table>-->
         <table class="table table-striped table-hover">
-  <thead class="thead-dark">
-    <tr>
-      <th scope="col">Id</th>
-      <th scope="col">Nom</th>
-      <th scope="col">Prénom</th>
-      <th scope="col">Email</th>
-      <th scope="col">Role</th>
-      <th scope="col">Options</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr v-for="{id, last_name, first_name, email, role} in users" :key="id">
-      <td><b>{{ id }}</b></td>
-      <td><b>{{ last_name }}</b></td>
-      <td><b>{{ first_name }}</b></td>
-      <td><b>{{ email }}</b></td>
-      <td><b>{{ role }}</b></td>
-      <td><button v-on:click="promote(id, first_name)">Promouvoir</button> | <button v-on:click="deleting(id)">Supprimer</button></td>
-    </tr>
-  </tbody>
-</table>
+            <thead class="thead-dark">
+                <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Nom</th>
+                <th scope="col">Prénom</th>
+                <th scope="col">Email</th>
+                <th scope="col">Role</th>
+                <th scope="col">Options</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="{id, last_name, first_name, email, role} in users" :key="id">
+                <td><b>{{ id }}</b></td>
+                <td><b>{{ last_name }}</b></td>
+                <td><b>{{ first_name }}</b></td>
+                <td><b>{{ email }}</b></td>
+                <td><b>{{ role }}</b></td>
+                <td><button v-on:click="promote(id, first_name)">Promouvoir</button> | <button v-on:click="deleting(id)">Supprimer</button></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </template>
 
@@ -58,6 +54,7 @@ export default {
                 Authorization: 'Bearer ' + this.token
             }}).then((response) => {
                 this.users = response.data;
+                this.users.splice(0, 1);
                 this.total = this.users.length;
             }).catch((error) => {
                 console.log(error);

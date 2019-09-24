@@ -13,7 +13,6 @@ export default {
         if (this.$router.history.current.path != "/login" && this.$router.history.current.path != "/signup")
           this.$router.push('/login')
       }
-
   }
 };
 </script>

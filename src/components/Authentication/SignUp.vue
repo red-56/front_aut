@@ -12,6 +12,7 @@
     </div>
     <div class="text-center">
       <mdb-btn type="submit">Register</mdb-btn>
+      <mdb-btn><router-link to="/login">Login</router-link></mdb-btn>
     </div>
   </form>
   </div>
