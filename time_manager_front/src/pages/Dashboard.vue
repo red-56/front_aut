@@ -6,11 +6,12 @@
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+import DashboardLayout from '@/pages';
 
 am4core.useTheme(am4themes_animated);
 
 export default {
-  name: 'HelloWorld',
+  name: 'Dashboard',
   mounted() {
     let chart = am4core.create(this.$refs.chartdiv, am4charts.XYChart);
 
@@ -50,6 +51,10 @@ export default {
     if (this.chart) {
       this.chart.dispose();
     }
+  },
+
+  components: {
+    DashboardLayout
   }
 };
 </script>

@@ -4,11 +4,11 @@
   <form @submit.prevent="register">
     <p class="h4 text-center mb-4">Sign up</p>
     <div class="h4 text-center mb-4">
-      <mdb-input icon="user" type="text" placeholder="  Your First Name" v-model="first_name"/>
-      <mdb-input icon="user" type="text" placeholder="  Your Last Name" v-model="last_name"/>
-      <mdb-input  icon="envelope" type="email" placeholder="  Your email" v-model="email"/>
-      <mdb-input  icon="lock" type="password" placeholder=" Your password" v-model="password"/>
-      <mdb-input  icon="lock" type="password" placeholder=" Confirm Your password" v-model="confirm_password"/>
+      <mdb-input icon="user" type="text" placeholder="  Your First Name" v-model="first_name" required/>
+      <mdb-input icon="user" type="text" placeholder="  Your Last Name" v-model="last_name" required/>
+      <mdb-input  icon="envelope" type="email" placeholder="  Your email" v-model="email" required/>
+      <mdb-input  icon="lock" type="password" placeholder=" Your password" v-model="password" required/>
+      <mdb-input  icon="lock" type="password" placeholder=" Confirm Your password" v-model="confirm_password" required/>
     </div>
     <div class="text-center">
       <mdb-btn type="submit">Register</mdb-btn>
@@ -53,16 +53,20 @@ export default {
           type: 'error',
           confirmButtonText: 'Réessayez'
         });
-      }
-
-      axios.post('http://localhost:3000/api/users/sign_up', {
+      } else {
+        axios.post('http://localhost:3000/api/users/sign_up', {
         first_name: this.first_name,
         last_name: this.last_name,
         email: this.email,
         password: this.password
       })
       .then((response) => {
-        window.location.href="/#/login";
+        Swal.fire(
+          'Félicitation',
+          'Vous êtes inscrit !',
+          'success'
+        );
+        this.$router.push('/login');
       })
       .catch((error) => {
         Swal.fire({
@@ -72,7 +76,8 @@ export default {
           confirmButtonText: 'Merci de réessayez'
         });
       });
-  }
+      }
+    }
 }
   
 };

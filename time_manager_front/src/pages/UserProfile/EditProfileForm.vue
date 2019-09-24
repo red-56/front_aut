@@ -52,7 +52,7 @@ import axios from 'axios';
 
 export default {
 
-  name: "edit-profile-form",
+  name: "EditProfileForm",
 
   props: {
     dataBackgroundColor: {

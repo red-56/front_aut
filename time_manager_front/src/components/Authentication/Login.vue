@@ -3,8 +3,8 @@
   <form class="form-signin" @submit.prevent="login">
     <p class="h4 text-center">Sign in</p>
     <div class="h4 text-center mb-4">
-      <mdb-input icon="envelope" v-model="email" type="email" placeholder="  Email"/>
-      <mdb-input icon="lock" v-model="password" type="password" placeholder="  Password"/>
+      <mdb-input icon="envelope" v-model="email" type="email" placeholder="  Email" required/>
+      <mdb-input icon="lock" v-model="password" type="password" placeholder="  Password" required/>
     </div>
     <div class="text-center">
       
@@ -52,8 +52,8 @@ export default {
     login() {
       axios.post('http://localhost:3000/api/users/sign_in', {email: this.email, password: this.password})
       .then((token) => {
-        console.log(token.data);
         localStorage.setItem('token', token.data.token);
+        // REDIRECTION VERS LE DASHBOARD
       })
       .catch((error) => {
         Swal.fire({

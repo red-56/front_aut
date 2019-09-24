@@ -9,9 +9,13 @@
 </template>
 
 <script>
-import { EditProfileForm } from "@/pages";
+
+import EditProfileForm from "@/pages/UserProfile/EditProfileForm";
 
 export default {
+
+  name: 'UserProfile',
+
   components: {
     EditProfileForm
   }
