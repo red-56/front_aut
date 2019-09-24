@@ -18,57 +18,58 @@ Vue.use(Router);
 
 export default new Router({
 
-  routes: [
+  routes : [
+ 
     {
       path: '/',
       redirect: '/login'
     },
     {
-      path: "/d/",
-      component: DashboardLayout,
-      meta: { 
-        requiresAuth: true
-      }
-    },
-    {
-      path: '/login',
-      name: "Login",
-      component: Login
+     path: "/login",
+     name: "Login",
+     component: Login
     },
     {
       path: "/signup",
       name: "SignUp",
       component: SignUp
-    },
+     },
     {
-      path: '/d/dashboard',
-      name: 'Dashboard',
-      component: Dashboard
-    },
-    {
-      path: '/d/user',
-      name: 'UserProfile',
-      component: UserProfile
-    },
-    {
-      path: '/d/timemanager',
-      name: 'TimeManager',
-      component: TimeManager
-    },
-    {
-      path: '/d/usermanager',
-      name: 'UserManager',
-      component: UserManager
-    },
-    {
-      path: '/d/teamgraph',
-      name: 'TeamGraph',
-      component: TeamGraph
-    },
-    {
-      path: '/d/usergraph',
-      name: 'UserGraph',
-      component: UserGraph
+      path: "/d/",
+      component: DashboardLayout,
+      children: [
+        {
+          path: "dashboard",
+          name: "Dashboard",
+          component: Dashboard
+        },
+        {
+          path: "user",
+          name: "User Profile",
+          component: UserProfile
+        },
+        {
+          path: "timemanager",
+          name: "Time Manager",
+          component: TimeManager
+        },
+        {
+          path: "teamgraph",
+          name: "Team Graph",
+          component: TeamGraph
+        },
+        {
+          path: "usergraph",
+          name: "User Graph",
+          component: UserGraph
+        },
+        {
+          path: "usermanager",
+          name: "User Manager",
+          component: UserManager
+        }
+  
+      ]
     }
   ]
 })
