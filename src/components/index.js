@@ -8,8 +8,10 @@ import NavTabsTable from "./Tables/NavTabsTable.vue";
 import OrderedTable from "./Tables/OrderedTable.vue";
 import SimpleTable from "./Tables/SimpleTable.vue";
 
-import Login from "Login.vue";
-import SignUp from "SignUp.vue";
+import Login from "./Authentication/Login.vue";
+import SignUp from "./Authentication/SignUp.vue";
+
+import DashboardLayout from '../pages/Layout/DashboardLayout.vue';
 
 export {
   ChartCard,
@@ -19,5 +21,6 @@ export {
   OrderedTable,
   SimpleTable,
   Login,
-  SignUp
+  SignUp,
+  DashboardLayout
 };
