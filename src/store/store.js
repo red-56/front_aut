@@ -22,7 +22,6 @@ export default new Vuex.Store({
       state.token = token;
     },
     logout: (state) => {
-      console.log("logout")
       state.token = null;
     }
   },
@@ -48,7 +47,6 @@ export default new Vuex.Store({
     },
 
     logout({commit}){
-      console.log("lolo")
       localStorage.removeItem('token');
       commit('logout');
       router.push('/login');

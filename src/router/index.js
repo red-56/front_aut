@@ -80,7 +80,6 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   store.dispatch('fetchToken');
   if (to.fullPath != '/login' && to.fullPath != "/signup") {
-    console.log(store.state.token)
     if (store.state.token == null) {
       next('/login');
     }

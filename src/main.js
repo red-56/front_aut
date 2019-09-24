@@ -2,7 +2,8 @@ import Vue from "vue";
 import App from "./App";
 import router from './router';
 import BootstrapVue from 'bootstrap-vue';
-import store from '@/store/store'
+import store from '@/store/store';
+import DatatableFactory from 'vuejs-datatable';
 
 Vue.use(BootstrapVue);
 

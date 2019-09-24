@@ -54,6 +54,7 @@ export default {
       .then((token) => {
         localStorage.setItem('token', token.data.token);
         localStorage.setItem('role', token.data.role);
+        localStorage.setItem('id', token.data.id);
         this.$router.push('/d/dashboard');
       })
       .catch((error) => {

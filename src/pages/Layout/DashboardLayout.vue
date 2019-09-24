@@ -7,26 +7,32 @@
         <md-icon>dashboard</md-icon>
         <p>Dashboard</p>
       </sidebar-link>
+
       <sidebar-link to="/d/user">
         <md-icon>person</md-icon>
         <p>User Profile</p>
       </sidebar-link>
+
       <sidebar-link to="/d/timemanager">
         <md-icon>content_paste</md-icon>
         <p>Time Manager</p>
       </sidebar-link>
-      <sidebar-link to="/d/teamgraph">
+
+      <sidebar-link v-if="admin || manager" to="/d/teamgraph">
         <md-icon>library_books</md-icon>
         <p>Team Graph</p>
       </sidebar-link>
-      <sidebar-link to="/d/usergraph">
+
+      <sidebar-link v-if="admin || manager" to="/d/usergraph">
         <md-icon>bubble_chart</md-icon>
         <p>User Graph</p>
       </sidebar-link>
-      <sidebar-link v-show="seen" to="/d/usermanager">
+
+      <sidebar-link v-if="admin" to="/d/usermanager">
         <md-icon>supervisor_account</md-icon>
         <p>User Manager</p>
       </sidebar-link>
+
         <md-icon>power_settings_new</md-icon>
         <button v-on:click="logout">Déconnexion</button>
     </side-bar>
@@ -54,12 +60,30 @@ export default {
   name: 'DashboardLayout',
   data() {
     return {
-      seen: true
+      seen: true,
+      admin: false,
+      manager: false,
+      user: false
     }
   },
   components: {
     TopNavbar,
     DashboardContent
+  },
+  created(){
+    if (localStorage.getItem('role') == 'Administrator') {
+      this.admin = true;
+      this.manager = false;
+      this.user = false;
+    } else if (localStorage.getItem('role') == 'Manager') {
+      this.manager = true;
+      this.admin = false;
+      this.user = false;
+    } else {
+      this.user = true;
+      this.admin = false;
+      this.manager = false;
+    }
   },
 
   methods: {

@@ -29,7 +29,7 @@
           <div class="md-layout-item md-small-size-100 md-size-100">
             <md-field>
               <label>Mot de passe</label>
-              <md-input v-model="password" type="password"></md-input>
+              <md-input v-model="password" type="password" required></md-input>
             </md-field>
           </div>
           <div></div>
@@ -49,6 +49,7 @@
 <script>
 
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export default {
 
@@ -65,6 +66,8 @@ export default {
     return {
       errors: [],
       currentUser: {},
+      user: {},
+      id: null,
       lastname: null,
       firstname: null,
       email: null,
@@ -81,42 +84,86 @@ export default {
   methods: {
     
     fetchData() {
-      axios.get('http://localhost:3000/api/users')
+      
+      axios.get('http://localhost:3000/api/users/' + localStorage.getItem('id'), {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('token')
+        }
+      })
       .then((response) => {
-          this.currentUser = response.data[0];
-          this.lastname = this.currentUser.last_name;
+          this.currentUser = response.data;
           this.firstname = this.currentUser.first_name;
+          this.lastname = this.currentUser.last_name;
           this.email = this.currentUser.email;
           this.password = this.currentUser.password;
+          this.updated_at = this.currentUser.updatedAt;
+          this.created_at = this.currentUser.createdAt;
       })
       .catch((error) => {
-          this.errors.push(error);
+          console.log(error);
       })
     },
 
     edit() {
 
-      this.currentUser.first_name = this.firstname;
-      this.currentUser.last_name = this.lastname;
-      this.currentUser.email = this.email;
-      this.currentUser.password = this.password;
-      axios.put('http://localhost:3000/api/users/' + this.currentUser.id, this.currentUser)
+      if (this.password == null) {
+        Swal.fire({
+          type: 'error',
+          title: 'Erreur',
+          text: 'Veuillez saisir le mot de passe',
+          footer: 'Merci de réessayez'
+        });
+      } else {
+        this.user.first_name = this.firstname;
+      this.user.last_name = this.lastname;
+      this.user.password = this.password;
+      this.user.email = this.email;
+
+      console.log(this.currentUser);
+
+      axios.put('http://localhost:3000/api/users/' + localStorage.getItem('id'), this.user, {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('token')
+        }
+      })
       .then((response) => {
-          console.log(response);
-          alert('MIS A JOUR');
+          Swal.fire(
+            'Félicitation',
+            'Profil mis à jour!',
+            'success'
+          );
       })
       .catch((e) => {
-          this.errors.push(e);
+        Swal.fire({
+          type: 'error',
+          title: 'Erreur',
+          text: 'Mise à jour du compte impossible',
+          footer: 'Merci de réessayez'
+        });
+        console.log(e);
       })
+      }
+
+      
     },
 
     remove() {
-      axios.delete('http://localhost:3000/api/users/' + this.currentUser.id)
+      axios.delete('http://localhost:3000/api/users/' + localStorage.getItem('id'))
       .then((response) => {
-          console.log(response);
+        Swal.fire(
+          'COMPTE',
+          'Votre compte a été supprimé avec succès',
+          'success'
+        );
+        // REDIRECTION VERS LE LOGIN
       })
       .catch((error) => {
-          this.errors.push(error);
+        Swal.fire({
+          type: 'error',
+          title: 'Erreur',
+          text: 'Suppression de compte impossible',
+          footer: 'Merci de réessayez'
+        });
       })
     }
   }
