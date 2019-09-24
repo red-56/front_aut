@@ -27,10 +27,8 @@
         <md-icon>supervisor_account</md-icon>
         <p>User Manager</p>
       </sidebar-link>
-      <sidebar-link  to="/login">
         <md-icon>power_settings_new</md-icon>
-        <p>Déconnexion</p>
-      </sidebar-link>
+        <button v-on:click="logout">Déconnexion</button>
     </side-bar>
 
     <div class="main-panel">
@@ -47,6 +45,8 @@
 
 import TopNavbar from "./TopNavbar.vue";
 import DashboardContent from "./Content.vue";
+import { mapActions } from 'vuex';
+import store from '@/store/store'
 
 
 export default {
@@ -57,10 +57,13 @@ export default {
       seen: true
     }
   },
-
   components: {
     TopNavbar,
     DashboardContent
+  },
+
+  methods: {
+    ...mapActions(["logout"])
   }
 };
 

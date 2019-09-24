@@ -16,12 +16,14 @@ import SignUp from "@/components/Authentication/SignUp.vue";
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
 
+  mode: 'history',
+  base: process.env.BASE_URL,
   routes : [
  
     {
-      path: '/',
+      path: '*',
       redirect: '/login'
     },
     {
@@ -72,17 +74,25 @@ export default new Router({
       ]
     }
   ]
-})
+});
 
-/*router.beforeEach((to, from, next) => {
-  if(to.matched.some(record => record.meta.requiresAuth)) {
-    if (store.getters.isLoggedIn) {
-      next()
-      return
+
+router.beforeEach((to, from, next) => {
+  store.dispatch('fetchToken');
+  if (to.fullPath != '/login' && to.fullPath != "/signup") {
+    console.log(store.state.token)
+    if (store.state.token == null) {
+      next('/login');
     }
-    next('/login') 
-  } else {
-    next() 
   }
-});*/
+  if (to.fullPath === '/login') {
+    if (store.state.token) {
+      next('/d/dashboard');
+    }
+  }
+  next();
+});
+
+export default router;
+
 
