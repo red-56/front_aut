@@ -18,6 +18,11 @@
         <p>Time Manager</p>
       </sidebar-link>
 
+       <sidebar-link v-if="admin || manager" to="/d/teammanager"> 
+        <md-icon>assignment_ind</md-icon>
+        <p>Team Manager</p>
+      </sidebar-link>
+
       <sidebar-link v-if="admin || manager" to="/d/teamgraph">
         <md-icon>library_books</md-icon>
         <p>Team Graph</p>

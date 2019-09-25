@@ -5,6 +5,7 @@ import Vue from 'vue';
 import DashboardLayout from "@/pages/Layout/DashboardLayout.vue";
 import UserProfile from "@/pages/UserProfile.vue";
 import TimeManager from "@/pages/TimeManager.vue";
+import TeamManager from "@/pages/TeamManager.vue";
 import TeamGraph from "@/pages/TeamGraph.vue";
 import UserGraph from "@/pages/UserGraph.vue";
 import UserManager from "@/pages/UserManager.vue";
@@ -54,6 +55,11 @@ const router = new Router({
           path: "timemanager",
           name: "Time Manager",
           component: TimeManager
+        },
+        {
+          path: "teammanager",
+          name: "Team Manager",
+          component: TeamManager
         },
         {
           path: "teamgraph",
