@@ -73,35 +73,25 @@ export default {
     },
 
     remove(id) {
-      Swal.fire({
-                title: 'Êtes vous sûr de vouloir supprimer cette team ?',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Oui supprimer'
-                }).then((result) => {
-                if (result.value) {
-                    axios.delete('http://localhost:3000/api/teams/' + id, {
-                        headers: {
-                            Authorization: 'Bearer ' + localStorage.getItem('token')
-                        }
-                    }).then(response => {
-                        this.getTeams();
-                        Swal.fire(
-                            'Supprimé!',
-                            'success'
-                        )
-                    }).catch(err => {
-                        Swal.fire({
-                            type: 'error',
-                            title: 'Erreur',
-                            text: 'Suppression impossible'
-                        })
-                        console.log(id);
-                    });
-                }
-            })
+      console.log(id);
+
+      axios.delete('http://localhost:3000/api/teams/' + id, {
+              headers: {
+                      Authorization: 'Bearer ' + localStorage.getItem('token')
+              }
+      }).then(response => {
+              this.getTeams();
+              Swal.fire(
+                      'Supprimé!',
+                      'success'
+              )
+      }).catch(err => {
+              Swal.fire({
+                      type: 'error',
+                      title: 'Erreur',
+                      text: 'Suppression impossible'
+              })
+      });
     },
 
     getTeams() {

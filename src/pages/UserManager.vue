@@ -18,7 +18,7 @@
                 <td><b>{{ first_name }}</b></td>
                 <td><b>{{ email }}</b></td>
                 <td><b>{{ role }}</b></td>
-                <td><button v-on:click="promote(id, first_name)">Promouvoir</button> | <button v-on:click="deleting(id)">Supprimer</button></td>
+                <td><button v-on:click="promote(id, first_name, role)">Promouvoir</button> | <button v-on:click="deleting(id)">Supprimer</button></td>
                 </tr>
             </tbody>
         </table>
@@ -87,28 +87,38 @@ export default {
                             title: 'Erreur',
                             text: 'Suppression impossible'
                         })
+                        console.log(err);
                     });
                 }
             })
         },
 
-        promote(id, first_name) {
-            axios.patch('http://localhost:3000/api/users/' + id, {role: 'Manager'}, {
-                headers: {
-                    Authorization: 'Bearer ' + localStorage.getItem('token')
-                }
-            })
-            .then((response) => {
-                this.getUsers();
-                Swal.fire(
-                    'Félicitation!',
-                    first_name + ' est devenu(e) Manager',
-                    'success'
-                )
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+        promote(id, first_name, role) {
+            if (role == 'Manager') {
+                Swal.fire({
+                    type: 'error',
+                    title: 'Erreur',
+                    text: first_name + ' est déjà Manager'
+                });
+            } else {
+                axios.patch('http://localhost:3000/api/users/' + id, {role: 'Manager'}, {
+                    headers: {
+                        Authorization: 'Bearer ' + localStorage.getItem('token')
+                    }   
+                })
+                .then((response) => {
+                    this.getUsers();
+                    Swal.fire(
+                        'Félicitation!',
+                        first_name + ' est devenu(e) Manager',
+                        'success'
+                    )
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            }
+            
         }
 
 

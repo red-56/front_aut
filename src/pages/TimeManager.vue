@@ -1,19 +1,19 @@
 <template>
     <div>
         <p> <b>&nbsp;&nbsp;&nbsp;{{ today }}</b></p>
-        <center><b-jumbotron header="Pointer" lead="Pensez à pointer à votre arrivé, et dès votre départ" class="center" border-variant="dark"><br>
+        <center><b-jumbotron header="Pointez" lead="Pensez à pointer à votre arrivé, et dès votre départ" class="center" border-variant="dark"><br>
             <b-button variant="primary" v-on:click="postClock" v-if="!statusClock">Démarrer</b-button>
             <b-button variant="primary" v-on:click="postClock" v-if="statusClock">{{chrono}} | stop</b-button><br><br>
             <b><span class="float-left">Arrivé(e): {{ arrival }}</span></b><b><span class="float-right">Parti(e): {{ departure }}</span></b>
         </b-jumbotron></center><br><br>
         <b-card bg-variant="light" text-variant="dark" border-variant="dark" title="Récapitulatif horaire d'aujourd'hui">
             <b-card-text>
-                Arrivé(e): <datetime class="arrivalInput" format="MM/DD/YYYY h:i:s" width="300px" v-model="setArrival" id="arrival"></datetime>
+                Arrivé(e): <datetime format="DD/MM/YYYY H:i:s" width="300px" v-model="setArrival"></datetime>
             </b-card-text>
             <b-card-text>
-                Parti(e): <datetime format="MM/DD/YYYY h:i:s" width="300px" v-model="setDeparture"></datetime>
+                Parti(e): <datetime format="DD/MM/YYYY H:i:s" width="300px" v-model="setDeparture"></datetime>
             </b-card-text>
-            <center><b-button href="#" variant="primary">Mettez à jours vos horaires</b-button></center>
+            <center><b-button href="#" variant="primary" v-on:click="setWorkingTime">Mettez à jours vos horaires</b-button></center>
         </b-card>
     </div>
 </template>
@@ -27,7 +27,6 @@ import Swal from 'sweetalert2';
 import datetime from 'vuejs-datetimepicker';
 import jwt_decode from 'jwt-decode';
 
-document.getElementsByClassName("arrivalInput").value('sdfsdf')
 export default {
     
     name: 'TimeManager',
@@ -54,6 +53,7 @@ export default {
         }
     },
     created(){
+
     },
     methods:{
         postClock(){
@@ -62,7 +62,8 @@ export default {
 
                 this.statusClock = true;
                 const now = moment.now();
-                this.arrival = moment().lang('fr').format('DD/MM/YYYY HH:mm:ss');
+                this.arrival = moment().toISOString().substring(0, moment().toISOString().length -1)
+                this.setArrival = this.arrival
                 this.clocks = {
                     status: true,
                     time: moment().toISOString().substring(0, moment().toISOString().length -1)
@@ -90,14 +91,13 @@ export default {
                 
                 this.chrono = null;
                 this.statusClock = false;
-                this.departure = moment().lang('fr').format('DD/MM/YYYY HH:mm:ss')
+                this.departure = moment().toISOString().substring(0, moment().toISOString().length -1);
+                this.setDeparture = this.departure;
                    this.clocks = {
                     status: false,
                     time: moment().toISOString().substring(0, moment().toISOString().length -1)
                 };
 
-
-                console.log(this.clocks.time)
                 axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id,  this.clocks, {
                     headers: {
                         Authorization: 'Bearer ' + localStorage.getItem('token')
@@ -114,6 +114,49 @@ export default {
                 Swal.fire("Vous avez travaillez " + this.finalChrono + " aujourd'hui");
             }
 
+        },
+
+        setWorkingTime() {
+
+            if (this.arrival != this.setArrival && this.departure != this.setDeparture) {
+                
+                this.clocks = {
+                    status: true,
+                    time: moment().toISOString().substring(0, moment(this.setArrival).toISOString().length -1)
+                };
+
+                axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id,  this.clocks, {
+                    headers: {
+                        Authorization: 'Bearer ' + localStorage.getItem('token')
+                    }
+                })
+                .then((response) => {
+                    console.log(response);
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
+
+                this.clocks = {
+                    status: false,
+                    time: moment().toISOString().substring(0, moment(this.setDeparture).toISOString().length -1)
+                };
+
+                axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id,  this.clocks, {
+                    headers: {
+                        Authorization: 'Bearer ' + localStorage.getItem('token')
+                    }
+                })
+                .then((response) => {
+                    console.log(response);
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
+            } else {
+                alert('VOUS NE POUVEZ PAS MODIFIER')
+            }
+            
         }
     }
 
