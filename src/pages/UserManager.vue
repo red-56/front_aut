@@ -1,5 +1,19 @@
 <template>
     <div>
+        <b-button v-b-modal.add-team class="float-right">Créer une équipe</b-button><br><br>
+        <b-modal id="add-team" ref="modal" title="Créer une équipe" @show="resetModal" @hidden="resetModal" @ok="handleOk">
+            <form ref="form" @submit.stop.prevent="handleSubmit">
+                <b-form-group label="Nom de l'équipe" label-for="teamName" invalid-feedback="Nom de l'équipe est obligatoire">
+                    <b-form-input id="teamName" v-model="teamName" required></b-form-input>
+                </b-form-group>
+                <b-form-group label="Choisissez un employé" invalid-feedback="Vous devez choisir un employé">
+                    <b-form-select v-model="selected">
+                        <option v-for="manager in managers" :key="manager.id">{{ manager.id }} | {{ manager.first_name }}</option>
+                    </b-form-select>
+                </b-form-group>
+            </form>
+        </b-modal>
+
         <table class="table table-striped table-hover">
             <thead class="thead-dark">
                 <tr>
@@ -36,26 +50,38 @@ export default {
     data() {
         return {
             users: [],
+            managers: [],
             token: localStorage.getItem('token'),
-            perPage: 10,
-            total: null,
-            currentPage: 1
+            teamName: '',
+            selected: null,
+            team: {
+                name: '',
+                managerId: 0
+            }
         }
     },
 
     created() {
-        this.getUsers();
+        this.getUsersAndManagers();
     },
 
     methods: {
 
-        getUsers() {
+        getUsersAndManagers() {
             axios.get('http://localhost:3000/api/users', {headers: {
                 Authorization: 'Bearer ' + this.token
             }}).then((response) => {
+                // RETRIEVE USERS
                 this.users = response.data;
                 this.users.splice(0, 1);
                 this.total = this.users.length;
+
+                // RETRIEVE MANAGERS
+                for (var i = 0; i < this.users.length; i++) {
+                    if (this.users[i].role == 'Manager') {
+                        this.managers.push(this.users[i]);
+                    }
+                }
             }).catch((error) => {
                 console.log(error);
             });
@@ -119,9 +145,45 @@ export default {
                 });
             }
             
-        }
+        },
 
+        // FOR MODAL TEAM ###############################################################
 
+        resetModal() {
+            this.teamName = '';
+            this.selected = null;
+        },
+
+        handleOk(bvModalEvt) {
+          // Prevent modal from closing
+          bvModalEvt.preventDefault()
+          // Trigger submit handler
+          this.handleSubmit()
+        },
+
+        handleSubmit() {
+
+            this.team = {
+                name: this.teamName,
+                managerId: this.selected.substring(0, 1)
+            }
+
+            axios.post('http://localhost:3000/api/teams', this.team, {
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+            .then((response) => {
+                alert('Equipe créée avec succès');
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+            this.$nextTick(() => {
+                this.$refs.modal.hide()
+            })
+        },
+        
     }
 }
 </script>
