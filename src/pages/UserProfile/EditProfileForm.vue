@@ -149,23 +149,35 @@ export default {
     },
 
     remove() {
-      axios.delete('http://localhost:3000/api/users/' + jwt_decode(localStorage.getItem('token')).id)
-      .then((response) => {
-        Swal.fire(
-          'COMPTE',
-          'Votre compte a été supprimé avec succès',
-          'success'
-        );
-        // REDIRECTION VERS LE LOGIN
-      })
-      .catch((error) => {
-        Swal.fire({
-          type: 'error',
-          title: 'Erreur',
-          text: 'Suppression de compte impossible',
-          footer: 'Merci de réessayez'
-        });
-      })
+      Swal.fire({
+                title: 'Êtes vous sûr de vouloir supprimer votre compte ?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Oui supprimer'
+                }).then((result) => {
+                if (result.value) {
+                    axios.delete('http://localhost:3000/api/users/' + jwt_decode(localStorage.getItem('token')).id, {
+                        headers: {
+                            Authorization: 'Bearer ' + localStorage.getItem('token')
+                        }
+                    }).then(response => {
+                        Swal.fire(
+                            'Supprimé!',
+                            'success'
+                        )
+                        window.location.href="http://localhost:8080/login"
+                    }).catch(err => {
+                        Swal.fire({
+                            type: 'error',
+                            title: 'Erreur',
+                            text: 'Suppression impossible'
+                        })
+                        console.log(err);
+                    });
+                }
+            })
     }
   }
 };
