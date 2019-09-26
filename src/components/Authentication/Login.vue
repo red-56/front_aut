@@ -53,8 +53,6 @@ export default {
       axios.post('http://localhost:3000/api/users/sign_in', {email: this.email, password: this.password})
       .then((token) => {
         localStorage.setItem('token', token.data.token);
-        localStorage.setItem('role', token.data.role);
-        localStorage.setItem('id', token.data.id);
         this.$router.push('/d/dashboard');
       })
       .catch((error) => {

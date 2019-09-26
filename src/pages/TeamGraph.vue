@@ -12,7 +12,7 @@
                 <tr v-for="{id, name} in myTeams" :key="id">
                 <td><b>{{ id }}</b></td>
                 <td><b>{{ name }}</b></td>
-                <td><b><button v-on:click="edit(id)">Editer</button> | <button v-on:click="remove(id)">Supprimer</button></b></td>
+                <td><button v-on:click="edit">Editer</button> | <button v-on:click="remove(id)">Supprimer</button></td>
                 </tr>
             </tbody>
       </table>
@@ -23,6 +23,7 @@
 
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import jwt_decode from 'jwt-decode';
 
 export default {
 
@@ -31,7 +32,9 @@ export default {
   data() {
     return {
       allTeams: [],
-      myTeams: []
+      myTeams: [],
+      name: '',
+      nameState: 'null'
     }
   },
   
@@ -110,11 +113,11 @@ export default {
     .then((response) => {
       this.allTeams = response.data;
 
-      if (localStorage.getItem('role') == 'Administrator') {
+      if (jwt_decode(localStorage.getItem('token')).role == 'Administrator') {
         this.myTeams = this.allTeams;
-      } else if (localStorage.getItem('role') == 'Manager') {
+      } else if (jwt_decode(localStorage.getItem('token')).role == 'Manager') {
         for (var i = 0; i < this.allTeams.length; i=i+1) {
-          if (this.allTeams[i].managerId == localStorage.getItem('id')) {
+          if (this.allTeams[i].managerId == jwt_decode(localStorage.getItem('token')).id) {
             this.myTeams.push(this.allTeams[i]);
           }
         }
@@ -123,7 +126,7 @@ export default {
     .catch((error) => {
       console.log(error);
     })
-    }
+  }
   }
 };
 </script>

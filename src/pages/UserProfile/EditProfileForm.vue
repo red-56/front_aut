@@ -50,6 +50,7 @@
 
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import jwt_decode from 'jwt-decode';
 
 export default {
 
@@ -85,7 +86,7 @@ export default {
     
     fetchData() {
       
-      axios.get('http://localhost:3000/api/users/' + localStorage.getItem('id'), {
+      axios.get('http://localhost:3000/api/users/' + jwt_decode(localStorage.getItem('token')).id, {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('token')
         }
@@ -121,7 +122,7 @@ export default {
 
       console.log(this.currentUser);
 
-      axios.put('http://localhost:3000/api/users/' + localStorage.getItem('id'), this.user, {
+      axios.put('http://localhost:3000/api/users/' + jwt_decode(localStorage.getItem('token')).id, this.user, {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('token')
         }
@@ -148,7 +149,7 @@ export default {
     },
 
     remove() {
-      axios.delete('http://localhost:3000/api/users/' + localStorage.getItem('id'))
+      axios.delete('http://localhost:3000/api/users/' + jwt_decode(localStorage.getItem('token')).id)
       .then((response) => {
         Swal.fire(
           'COMPTE',

@@ -52,7 +52,8 @@
 import TopNavbar from "./TopNavbar.vue";
 import DashboardContent from "./Content.vue";
 import { mapActions } from 'vuex';
-import store from '@/store/store'
+import store from '@/store/store';
+import jwt_decode from 'jwt-decode';
 
 
 export default {
@@ -60,6 +61,7 @@ export default {
   name: 'DashboardLayout',
   data() {
     return {
+      role: null,
       seen: true,
       admin: false,
       manager: false,
@@ -71,11 +73,13 @@ export default {
     DashboardContent
   },
   created(){
-    if (localStorage.getItem('role') == 'Administrator') {
+    this.role = jwt_decode(localStorage.getItem('token')).role;
+
+    if (this.role == 'Administrator') {
       this.admin = true;
       this.manager = false;
       this.user = false;
-    } else if (localStorage.getItem('role') == 'Manager') {
+    } else if (this.role == 'Manager') {
       this.manager = true;
       this.admin = false;
       this.user = false;

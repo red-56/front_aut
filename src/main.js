@@ -3,12 +3,17 @@ import App from "./App";
 import router from './router';
 import BootstrapVue from 'bootstrap-vue';
 import store from '@/store/store';
-import DatatableFactory from 'vuejs-datatable';
+import Datetime from 'vue-datetime';
+
 
 Vue.use(BootstrapVue);
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
+
+import 'vue-datetime/dist/vue-datetime.css'
+
+Vue.use(Datetime)
 
 // Plugins
 import GlobalDirectives from "./globalDirectives";
