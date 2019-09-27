@@ -1,41 +1,27 @@
 <template>
   <div>
-    <table class="table table-striped table-hover" v-if="admin">
-            <thead class="thead-dark">
-                <tr>
-                <th scope="col">Id</th>
-                <th scope="col">Nom de l'équipe</th>
-                <th scope="col">Options</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="{id, name} in myTeams" :key="id">
-                <td><b>{{ id }}</b></td>
-                <td><b>{{ name }}</b></td>
-                <td><button v-on:click="edit(id)">Editer</button> | <button v-on:click="remove(id)">Supprimer</button></td>
-                </tr>
-            </tbody>
-      </table>
 
-      <table class="table table-striped table-hover" v-if="manager">
-            <thead class="thead-dark">
-                <tr>
-                <th scope="col">Id</th>
-                <th scope="col">Nom de l'équipe</th>
-                <th scope="col">Options</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="myTeam in myTeams" :key="myTeam.id">
-                <td><b>{{ myTeam.id }}</b></td>
-                <td><b>{{ myTeam.name }}</b></td>
-                <td><button v-on:click="edit(myTeam.id)">Editer</button> | <button v-on:click="remove(myTeam.id)">Supprimer</button></td>
-                </tr>
-            </tbody>
-      </table>
+    <select v-if="admin" id="listTeams">
+        <option>Choisissez une équipe</option>
+        <option v-for="team in myTeams" :key="team.id" :value="team.id" v-on:click="selectedValue">{{ team.name }}</option>
+    </select>
 
-      <br><br>
-      <center><button v-on:click="display">Afficher le graph</button></center>
+    <select v-if="manager" id="listTeams">
+        <option>Choisissez une équipe</option>
+        <option v-for="team in myTeams" :key="team.id" :value="team.id" v-on:click="selectedValue">{{ team.name }}</option>
+    </select>
+
+    <br><br>
+    <center><button v-on:click="display">Afficher le graph</button>&nbsp;&nbsp;&nbsp;<b-button v-b-modal.edit-team v-on:click="edit" v-if="admin">Editer</b-button>&nbsp;&nbsp;&nbsp;<button v-on:click="remove" v-if="admin">Supprimer</button></center>
+
+    <b-modal id="edit-team" ref="modal" title="Modifier cette équipe" @show="resetModal" @hidden="resetModal" @ok="handleOk">
+            <form ref="form" @submit.stop.prevent="handleSubmit">
+                <b-form-group label="Nom de l'équipe" label-for="nameTeam">
+                    <b-form-input id="nameTeam" v-model="nameTeam"></b-form-input>
+                </b-form-group>
+            </form>
+    </b-modal>
+
   </div>
 </template>
 
@@ -56,9 +42,15 @@ export default {
       allTeams: [],
       myTeams: [],
       name: '',
-      nameState: 'null'
+      nameState: 'null',
+      teamId: null,
+      teamName: null,
+      managerId: null,
+      nameTeam: null
     }
   },
+
+
   
   props: {
     dataBackgroundColor: {
@@ -73,6 +65,10 @@ export default {
   },
 
   methods: {
+
+    selectedValue(e){
+      this.teamId = e.target.value;
+    },
 
     checkRole() {
       if (jwt_decode(localStorage.getItem('token')).role == 'Administrator') {
@@ -105,7 +101,6 @@ export default {
               this.myTeams.push(this.allTeams[i]);
             }
           }
-          console.log(this.myTeams);
         }
       })
       .catch((error) => {
@@ -113,34 +108,102 @@ export default {
       })
     },
 
-    edit(id) {
-      alert('ho')
+    edit(teamName) {
+      console.log(this.teamId);
+      
+      if (this.teamId == null) {
+        alert('Erreur: aucune équipe selectionnée');
+      } else {
+        axios.get('http://localhost:3000/api/teams/' + this.teamId, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('token')
+          }
+        })
+        .then((resp) => {
+          this.teamName = resp.data.name;
+          this.managerId = resp.data.managerId;
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+      }
     },
 
-    remove(id) {
+    remove() {
 
-      axios.delete('http://localhost:3000/api/teams/' + id, {
+      if (this.teamId == null) {
+        alert('Erreur: aucune équipe selectionnée');
+      } else {
+        axios.delete('http://localhost:3000/api/teams/' + this.teamId, {
               headers: {
                       Authorization: 'Bearer ' + localStorage.getItem('token')
               }
-      }).then(response => {
+        }).then(response => {
               this.getTeams();
               Swal.fire(
                       'Supprimé!',
                       'success'
               )
-      }).catch(err => {
+        }).catch(err => {
               Swal.fire({
                       type: 'error',
                       title: 'Erreur',
                       text: 'Suppression impossible'
               })
       });
+      }
+
+      console.log(this.teamId);
     },
 
     display() {
-      alert('GRAPH');
-    }
+      if (this.teamId == null) {
+        alert('Erreur: aucune team selectionnée');
+      } else {
+        alert('GRAPH DE LA TEAM ID: ' + this.teamId);
+      }
+    },
+
+    // ###########################################################################
+
+    resetModal() {
+            this.nameTeam = this.teamName;
+    },
+
+        handleOk(bvModalEvt) {
+          // Prevent modal from closing
+          bvModalEvt.preventDefault()
+          // Trigger submit handler
+          this.handleSubmit()
+        },
+
+        handleSubmit() {
+
+            axios.put('http://localhost:3000/api/teams/' + this.teamId, {name: this.nameTeam, managerId: this.managerId}, {
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+            .then((response) => {
+                alert('Equipe mise à jour avec succès');
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+            this.$nextTick(() => {
+                this.$refs.modal.hide()
+            })
+        },
   }
 };
 </script>
+
+<style>
+
+#listTeams {
+  width: 80%;
+  display: block;
+  margin: 0 auto;
+}
+</style>
+
