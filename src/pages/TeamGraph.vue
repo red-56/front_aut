@@ -26,13 +26,16 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="{id, name} in myTeams" :key="id">
-                <td><b>{{ id }}</b></td>
-                <td><b>{{ name }}</b></td>
-                <td><button v-on:click="edit(id)">Editer</button> | <button v-on:click="remove(id)">Supprimer</button></td>
+                <tr v-for="myTeam in myTeams" :key="myTeam.id">
+                <td><b>{{ myTeam.id }}</b></td>
+                <td><b>{{ myTeam.name }}</b></td>
+                <td><button v-on:click="edit(myTeam.id)">Editer</button> | <button v-on:click="remove(myTeam.id)">Supprimer</button></td>
                 </tr>
             </tbody>
       </table>
+
+      <br><br>
+      <center><button v-on:click="display">Afficher le graph</button></center>
   </div>
 </template>
 
@@ -91,16 +94,18 @@ export default {
           }
       })
       .then((response) => {
+
           this.allTeams = response.data;
 
         if (jwt_decode(localStorage.getItem('token')).role == 'Administrator') {
             this.myTeams = this.allTeams;
         } else if (jwt_decode(localStorage.getItem('token')).role == 'Manager') {
-            for (var i = 0; i < this.allTeams.length; i=i+1) {
+            for (var i = 0; i < this.allTeams.length; i++) {
             if (this.allTeams[i].managerId == jwt_decode(localStorage.getItem('token')).id) {
               this.myTeams.push(this.allTeams[i]);
             }
           }
+          console.log(this.myTeams);
         }
       })
       .catch((error) => {
@@ -131,6 +136,10 @@ export default {
                       text: 'Suppression impossible'
               })
       });
+    },
+
+    display() {
+      alert('GRAPH');
     }
   }
 };

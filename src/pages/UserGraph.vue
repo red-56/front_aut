@@ -7,7 +7,6 @@
                     <th scope="col">Id</th>
                     <th scope="col">Nom</th>
                     <th scope="col">Prénom</th>
-                    <th scope="col">Email</th>
                     <th scope="col">Role</th>
                 </tr>
             </thead>
@@ -16,7 +15,6 @@
                     <td><b>{{ user.id }}</b></td>
                     <td><b>{{ user.first_name }}</b></td>
                     <td><b>{{ user.last_name }}</b></td>
-                    <td><b>{{ user.email }}</b></td>
                     <td><b>{{ user.role }}</b></td>
                 </tr>
             </tbody>
@@ -43,6 +41,10 @@
                 </tr>
             </tbody>
       </table>
+
+      <br><br>
+
+      <center><button v-on:click="display">Afficher le graph</button></center>
 
 
     </div>
@@ -127,6 +129,10 @@ export default {
             .catch((errors) => {
                 console.log(errors);
             });
+        },
+
+        display() {
+            alert('GRAPH');
         }
     }
 }
