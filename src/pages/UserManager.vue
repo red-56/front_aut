@@ -8,7 +8,7 @@
                 </b-form-group>
                 <b-form-group label="Choisissez un employé" invalid-feedback="Vous devez choisir un employé">
                     <b-form-select v-model="selected">
-                        <option v-for="manager in managers" :key="manager.id">{{ manager.id }} | {{ manager.first_name }}</option>
+                        <option v-for="manager in managers" :key="manager.id" :value="manager.id" v-on:click="selectedValue">{{ manager.first_name }}</option>
                     </b-form-select>
                 </b-form-group>
             </form>
@@ -54,6 +54,7 @@ export default {
             token: localStorage.getItem('token'),
             teamName: '',
             selected: null,
+            managerId: null,
             team: {
                 name: '',
                 managerId: 0
@@ -66,6 +67,10 @@ export default {
     },
 
     methods: {
+
+        selectedValue(e) {
+            this.managerId = e.target.value;
+        },
 
         getUsersAndManagers() {
             axios.get('http://localhost:3000/api/users', {headers: {
@@ -133,7 +138,7 @@ export default {
                     }   
                 })
                 .then((response) => {
-                    this.getUsers();
+                    this.getUsersAndManagers();
                     Swal.fire(
                         'Félicitation!',
                         first_name + ' est devenu(e) Manager',
@@ -165,7 +170,7 @@ export default {
 
             this.team = {
                 name: this.teamName,
-                managerId: this.selected.substring(0, 1)
+                managerId: this.managerId
             }
 
             axios.post('http://localhost:3000/api/teams', this.team, {
