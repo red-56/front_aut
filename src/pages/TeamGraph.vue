@@ -12,15 +12,7 @@
     </select>
 
     <br><br>
-    <center><button v-on:click="display">Afficher le graph</button>&nbsp;&nbsp;&nbsp;<b-button v-b-modal.edit-team v-on:click="edit" v-if="admin">Editer</b-button>&nbsp;&nbsp;&nbsp;<button v-on:click="remove" v-if="admin">Supprimer</button></center>
-
-    <b-modal id="edit-team" ref="modal" title="Modifier cette équipe" @show="resetModal" @hidden="resetModal" @ok="handleOk">
-            <form ref="form" @submit.stop.prevent="handleSubmit">
-                <b-form-group label="Nom de l'équipe" label-for="nameTeam">
-                    <b-form-input id="nameTeam" v-model="nameTeam"></b-form-input>
-                </b-form-group>
-            </form>
-    </b-modal>
+    <center><button v-on:click="display">Afficher le graph</button></center>
 
   </div>
 </template>
@@ -108,54 +100,6 @@ export default {
       })
     },
 
-    edit(teamName) {
-      console.log(this.teamId);
-      
-      if (this.teamId == null) {
-        alert('Erreur: aucune équipe selectionnée');
-      } else {
-        axios.get('http://localhost:3000/api/teams/' + this.teamId, {
-          headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token')
-          }
-        })
-        .then((resp) => {
-          this.teamName = resp.data.name;
-          this.managerId = resp.data.managerId;
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-      }
-    },
-
-    remove() {
-
-      if (this.teamId == null) {
-        alert('Erreur: aucune équipe selectionnée');
-      } else {
-        axios.delete('http://localhost:3000/api/teams/' + this.teamId, {
-              headers: {
-                      Authorization: 'Bearer ' + localStorage.getItem('token')
-              }
-        }).then(response => {
-              this.getTeams();
-              Swal.fire(
-                      'Supprimé!',
-                      'success'
-              )
-        }).catch(err => {
-              Swal.fire({
-                      type: 'error',
-                      title: 'Erreur',
-                      text: 'Suppression impossible'
-              })
-      });
-      }
-
-      console.log(this.teamId);
-    },
-
     display() {
       if (this.teamId == null) {
         alert('Erreur: aucune team selectionnée');
@@ -163,37 +107,6 @@ export default {
         alert('GRAPH DE LA TEAM ID: ' + this.teamId);
       }
     },
-
-    // ###########################################################################
-
-    resetModal() {
-            this.nameTeam = this.teamName;
-    },
-
-        handleOk(bvModalEvt) {
-          // Prevent modal from closing
-          bvModalEvt.preventDefault()
-          // Trigger submit handler
-          this.handleSubmit()
-        },
-
-        handleSubmit() {
-
-            axios.put('http://localhost:3000/api/teams/' + this.teamId, {name: this.nameTeam, managerId: this.managerId}, {
-                headers: {
-                    Authorization: 'Bearer ' + localStorage.getItem('token')
-                }
-            })
-            .then((response) => {
-                alert('Equipe mise à jour avec succès');
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-            this.$nextTick(() => {
-                this.$refs.modal.hide()
-            })
-        },
   }
 };
 </script>
