@@ -8,12 +8,12 @@
         </select>
         
 
-      <!-- CASE MANAGER 
+      <!-- CASE MANAGER  -->
 
         <select v-if="manager" id="listUsers">
             <option>Choisissez un utilisateur</option>
-            <option v-for="user in myUsersInfo" :key="user.id" :value="user.id" v-on:click="selectedValue">{{ user.first_name }} / {{ user.last_name }} / {{ user.role }}</option>
-        </select>-->
+            <option v-for="user in myUsersInfoUnique" :key="user.id" :value="user.id" v-on:click="selectedValue">{{ user.first_name }} / {{ user.last_name }} / {{ user.role }}</option>
+        </select>
 
       
 
@@ -93,6 +93,8 @@ export default {
             })
         },
 
+    
+
         getMyUsers() {
 
             // GET ALL THE TEAMS
@@ -120,12 +122,17 @@ export default {
                     })
                     .then((resp) => {
                         this.myUsers = resp.data;
+
+        
                         
                         if (this.myUsers.length == 0) {
-                            //continue;
+                            console.log("team vide");
                         } else {
                             for (var k = 0; k < this.myUsers.length; k++) {
-                                this.myUsersInfo.push(this.myUsers[k]);
+                                if (this.myUsers[k].employeeId != jwt_decode(localStorage.getItem('token')).id && 
+                                this.myUsersInfo.includes(this.myUsers[k].employeeId) == false) {
+                                     this.myUsersInfo.push(this.myUsers[k].employeeId);
+                                }
                             }
                         }
 
@@ -135,15 +142,24 @@ export default {
                         console.log(err);
                     });
                 }
+                
 
-                // GET INFO BY THEIR ID
+                for (var l = 0; l < this.myUsersInfo.length; l++){
+                    axios.get('http://localhost:3000/api/users/' + this.myUsersInfo[l].id, {
+                        headers: {
+                            Authorization: 'Bearer ' + localStorage.getItem('token')
+                        }
+                    })
+                    .then((resp) => {
+                        this.myUsersInfoUnique.push(resp.data);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+                }
 
-                console.log('Tableau de mes employés');
-                console.log(this.myUsersInfo);
-
-                console.log('Afficher l employé numéro 0');
-                console.log(this.myUsersInfo[0]);
-
+                
+               
                 
             })
             .catch((error) => {
