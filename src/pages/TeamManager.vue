@@ -28,11 +28,21 @@
       <option v-for="employee in myEmployeesInfo" :key="employee.id" :value="employee.id" v-on:click="selectedValueMyEmployee">{{ employee.first_name }} {{ employee.last_name }} /{{ employee.role }}</option>
     </select>
 
+    <!-- For editing team -->
+    <b-modal id="edit-team" ref="modal" title="Modifier le nom de l'équipe" @show="resetModal" @hidden="resetModal" @ok="handleOk">
+        <form ref="form" @submit.stop.prevent="handleSubmit">
+            <b-form-group label="Nom de l'équipe" label-for="teamName" invalid-feedback="Nom de l'équipe est obligatoire">
+                <b-form-input id="teamName" v-model="teamName" required></b-form-input>
+            </b-form-group>
+        </form>
+    </b-modal>
+
     <br>
     <br>
     <center>
       <button v-on:click="addTo">Ajouter à</button>&nbsp;&nbsp;&nbsp;
-      <button v-on:click="removeFrom">Supprimer de:</button>
+      <button v-on:click="removeFrom">Supprimer de:</button>&nbsp;&nbsp;&nbsp;
+      <button v-b-modal.edit-team>Editer une équipe</button>
     </center>
   </div>
 </template>
@@ -69,6 +79,8 @@ export default {
 
       members: [],
       into: null,
+      teamName: '',
+      nameofTeam: ''
     };
   },
 
@@ -321,7 +333,95 @@ export default {
                 console.log(error);
             });
         }
-    }
+    },
+
+    // FOR MODAL TEAM ###############################################################
+
+        resetModal() {
+            
+            if (this.admin) {
+                axios.get('http://localhost:3000/api/teams/' + this.teamId, {
+                    headers: {
+                        Authorization: 'Bearer ' + localStorage.getItem('token')
+                    }
+                })
+                .then((response) => {
+                    this.nameofTeam = response.data.name;
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            } else if (this.manager) {
+                axios.get('http://localhost:3000/api/teams/' + this.myTeamId, {
+                    headers: {
+                        Authorization: 'Bearer ' + localStorage.getItem('token')
+                    }
+                })
+                .then((response) => {
+                    this.nameofTeam = response.data.name;
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            }
+
+            this.teamName = this.nameofTeam
+        },
+
+        handleOk(bvModalEvt) {
+          // Prevent modal from closing
+          bvModalEvt.preventDefault()
+          // Trigger submit handler
+          this.handleSubmit()
+        },
+
+        handleSubmit() {
+
+            if (this.admin) {
+
+                axios.get('http://localhost:3000/api/teams/' + this.teamId, {
+                    headers: {
+                        Authorization: 'Bearer ' + localStorage.getItem('token')
+                    }
+                })
+                .then((response) => {
+                    this.managerId = response.data.managerId;
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+                
+
+                axios.put('http://localhost:3000/api/teams/' + this.teamId, {name: this.teamName, managerId: this.managerId}, {
+                    headers: {
+                        Authorization: 'Bearer ' + localStorage.getItem('token')
+                    }
+                })
+                .then((response) => {
+                    alert('Mise à jour réussie')
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            } else if (this.manager) {
+                axios.put('http://localhost:3000/api/teams/' + this.myTeamId, {name: this.teamName, managerId: jwt_decode(localStorage.getItem('token')).id}, {
+                    headers: {
+                        Authorization: 'Bearer ' + localStorage.getItem('token')
+                    }
+                })
+                .then((response) => {
+                    alert('Mise à jour réussie')
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            }
+
+
+            this.$nextTick(() => {
+                this.$refs.modal.hide()
+            })
+        },
   }
 };
 </script>

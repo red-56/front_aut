@@ -49,7 +49,7 @@ export default {
                 }
             ],
             timeOptions: {
-                start: '28/09/2019 13:27:00',
+                start: '',
                 step: '',
                 end: ''
             },
@@ -137,9 +137,25 @@ export default {
 
         setWorkingTime() {
 
+            if (this.chrono == null && (this.setDeparture == null || this.setArrival == null)) {
+                alert('rien à mettre à jour');
+                return;
+            }
+
+            if (this.chrono != null && (this.setDeparture == null || this.setArrival == null)) {
+                alert('Vous ne pouvez pas mettre à jour car le chronomètre tourne toujours');
+                return;
+            }
+
             if (this.setArrival != null && this.setDeparture != null) {
+
+                this.clocks = {
+                    status: true,
+                    time: moment().toISOString().substring(0, moment().toISOString().length -1)
+                }
+
                 // SET L ARRIVEE
-                axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id, {status: true, time: this.setArrival}, {
+                axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id, this.clocks, {
                     headers: {
                             Authorization: 'Bearer ' + localStorage.getItem('token')
                     }
@@ -151,8 +167,13 @@ export default {
                     console.log(error);
                 });
 
+                this.clocks = {
+                    status: false,
+                    time: moment().toISOString().substring(0, moment().toISOString().length -1)
+                }
+
                 // SET LE DEPART
-                axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id, {status: false, time: this.setDeparture}, {
+                axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id, this.clocks, {
                     headers: {
                         Authorization: 'Bearer ' + localStorage.getItem('token')
                     }
