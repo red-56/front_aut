@@ -145,7 +145,7 @@ export default {
                 
 
                 for (var l = 0; l < this.myUsersInfo.length; l++){
-                    axios.get('http://localhost:3000/api/users/' + this.myUsersInfo[l].id, {
+                    axios.get('http://localhost:3000/api/users/' + this.myUsersInfo[l], {
                         headers: {
                             Authorization: 'Bearer ' + localStorage.getItem('token')
                         }
