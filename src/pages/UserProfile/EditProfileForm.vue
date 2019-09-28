@@ -51,6 +51,7 @@
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import jwt_decode from 'jwt-decode';
+import router from '../../router/index'
 
 export default {
 
@@ -75,6 +76,7 @@ export default {
       password: null,
       created_at: null,
       updated_at: null,
+      confirm_password: null
     };
   },
 
@@ -149,6 +151,17 @@ export default {
     },
 
     remove() {
+      if (jwt_decode(localStorage.getItem('token')).id == 1) {
+        alert('Vous ne pouvez pas supprimer votre compte, vous êtes Administrateur');
+        return;
+      } else if (jwt_decode(localStorage.getItem('token')).id != 1 && this.password == null) {
+          Swal.fire({
+          type: 'error',
+          title: 'Erreur',
+          text: 'Veuillez saisir le mot de passe',
+          footer: 'Merci de réessayez'
+        });
+      } else if (jwt_decode(localStorage.getItem('token')).id != 1 && this.password != null)
       Swal.fire({
                 title: 'Êtes vous sûr de vouloir supprimer votre compte ?',
                 type: 'warning',
@@ -167,7 +180,8 @@ export default {
                             'Supprimé!',
                             'success'
                         )
-                        window.location.href="http://localhost:8080/login"
+                        localStorage.removeItem('token');
+                        router.push('/login');
                     }).catch(err => {
                         Swal.fire({
                             type: 'error',

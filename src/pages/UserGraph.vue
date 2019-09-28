@@ -8,12 +8,12 @@
         </select>
         
 
-      <!-- CASE MANAGER -->
+      <!-- CASE MANAGER 
 
         <select v-if="manager" id="listUsers">
             <option>Choisissez un utilisateur</option>
             <option v-for="user in myUsersInfo" :key="user.id" :value="user.id" v-on:click="selectedValue">{{ user.first_name }} / {{ user.last_name }} / {{ user.role }}</option>
-        </select>
+        </select>-->
 
       
 
@@ -43,8 +43,9 @@ export default {
             users: [],
 
             // CASE MANAGER
-            myUsers: [],
+            allTeams: [],
             myTeams: [],
+            myUsers: [],
             myUsersInfo: [],
 
             // FOR ALL
@@ -55,7 +56,7 @@ export default {
     created() {
         this.checkRole();
         this.getUsers();
-        this.getTeams();
+        this.getMyUsers();
     },
 
     methods: {
@@ -91,60 +92,31 @@ export default {
             })
         },
 
-        getTeams() {
+        getMyUsers() {
+            // GET ALL TEAMS
             axios.get('http://localhost:3000/api/teams', {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
                 }
             })
-            .then((response) => {
-                this.allTeams = response.data;
-
-                if (this.manager) {
-                    for (var i = 0; i < this.allTeams.length; i=i+1) {
-                        if (this.allTeams[i].managerId == jwt_decode(localStorage.getItem('token')).id) {
-                            this.myTeams.push(this.allTeams[i]);
-                        }
-                    }
-
-                    for (var j = 0; j < this.myTeams.length; j++) {
-                        axios.get('http://localhost:3000/api/teamscontent/team/' + this.myTeams[j].id, {
-                            headers: {
-                                Authorization: 'Bearer ' + localStorage.getItem('token')
-                            }
-                        })
-                        .then((resp) => {
-                            for (var k = 0; k < resp.data.length; k++) {
-                                this.myUsers.push(resp.data[k].employeeId);
-                            }
-
-                            for (var l = 0; l < this.myUsers.length; l++) {
-                                axios.get('http://localhost:3000/api/users/' + this.myUsers[l], {
-                                    headers: {
-                                        Authorization: 'Bearer ' + localStorage.getItem('token')
-                                    }
-                                })
-                                .then((res) => {
-                                    this.myUsersInfo.push(res.data);
-                                })
-                                .catch((err) => {
-                                    console.log(err);
-                                });
-                            }
-
-                            console.log('MY USERS');
-                            console.log(this.myUsersInfo);
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                        });
-                    }
-                }
+            .then(response => {
+                this.allTeams.push(response.data)
             })
-            .catch((errors) => {
+            .catch(errors => {
                 console.log(errors);
             });
-            
+
+            console.log(this.allTeams);
+
+            // GET MY TEAMS
+            for(var i = 0; i < this.allTeams; i++) {
+                if (this.allTeams[i].managerId == jwt_decode(localStorage.getItem('token')).id) {
+                    this.myTeams.push(this.allTeams[i]);
+                }
+            }
+
+            // CONSOLE MY TEAMS
+            console.log(this.myTeams);
         },
 
         display() {
