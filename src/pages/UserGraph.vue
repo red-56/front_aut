@@ -47,6 +47,7 @@ export default {
             myTeams: [],
             myUsers: [],
             myUsersInfo: [],
+            myUsersInfoUnique: [],
 
             // FOR ALL
             userId: null,
@@ -93,30 +94,64 @@ export default {
         },
 
         getMyUsers() {
-            // GET ALL TEAMS
+
+            // GET ALL THE TEAMS
             axios.get('http://localhost:3000/api/teams', {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
                 }
             })
-            .then(response => {
-                this.allTeams.push(response.data)
+            .then((response) => {
+                this.allTeams = response.data;
+
+                // GET MY TEAMS ONLY
+                for (var i = 0; i < this.allTeams.length; i++) {
+                    if (this.allTeams[i].managerId == jwt_decode(localStorage.getItem('token')).id) {
+                        this.myTeams.push(this.allTeams[i]);
+                    }
+                }
+
+                // GET MY USERS
+                for (var j = 0; j < this.myTeams.length; j++) {
+                    axios.get('http://localhost:3000/api/teamscontent/team/' + this.myTeams[j].id, {
+                        headers: {
+                            Authorization: 'Bearer ' + localStorage.getItem('token')
+                        }
+                    })
+                    .then((resp) => {
+                        this.myUsers = resp.data;
+                        
+                        if (this.myUsers.length == 0) {
+                            //continue;
+                        } else {
+                            for (var k = 0; k < this.myUsers.length; k++) {
+                                this.myUsersInfo.push(this.myUsers[k]);
+                            }
+                        }
+
+                        
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+                }
+
+                // GET INFO BY THEIR ID
+
+                console.log('Tableau de mes employés');
+                console.log(this.myUsersInfo);
+
+                console.log('Afficher l employé numéro 0');
+                console.log(this.myUsersInfo[0]);
+
+                
             })
-            .catch(errors => {
-                console.log(errors);
+            .catch((error) => {
+                console.log(error);
             });
 
-            console.log(this.allTeams);
+            
 
-            // GET MY TEAMS
-            for(var i = 0; i < this.allTeams; i++) {
-                if (this.allTeams[i].managerId == jwt_decode(localStorage.getItem('token')).id) {
-                    this.myTeams.push(this.allTeams[i]);
-                }
-            }
-
-            // CONSOLE MY TEAMS
-            console.log(this.myTeams);
         },
 
         display() {

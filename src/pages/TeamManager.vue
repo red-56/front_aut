@@ -347,6 +347,7 @@ export default {
                 })
                 .then((response) => {
                     this.nameofTeam = response.data.name;
+                    this.teamName = this.nameofTeam
                 })
                 .catch((error) => {
                     console.log(error);
@@ -359,13 +360,14 @@ export default {
                 })
                 .then((response) => {
                     this.nameofTeam = response.data.name;
+                    this.teamName = this.nameofTeam
                 })
                 .catch((error) => {
                     console.log(error);
                 });
             }
 
-            this.teamName = this.nameofTeam
+            
         },
 
         handleOk(bvModalEvt) {
