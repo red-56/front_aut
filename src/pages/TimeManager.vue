@@ -8,10 +8,10 @@
         </b-jumbotron></center><br><br>
         <b-card bg-variant="light" text-variant="dark" border-variant="dark" title="Récapitulatif horaire d'aujourd'hui">
             <b-card-text>
-                Arrivé(e): <datetime format="DD/MM/YYYY H:i:s" width="300px" v-model="setArrival"></datetime>
+                Arrivé(e): <date-picker format="DD/MM/YYYY HH:mm:ss" valueType="format" v-model="setArrival" type="datetime" :time-picker-options="timeOptions" :lang="lang" :shortcuts="shortcuts"></date-picker>
             </b-card-text>
             <b-card-text>
-                Parti(e): <datetime format="DD/MM/YYYY H:i:s" width="300px" v-model="setDeparture"></datetime>
+                Parti(e): <date-picker format="DD/MM/YYYY HH:mm:ss" valueType="format" v-model="setDeparture" type="datetime" :time-picker-options="timeOptions" :lang="lang" :shortcuts="shortcuts"></date-picker>
             </b-card-text>
             <center><b-button href="#" variant="primary" v-on:click="setWorkingTime">Mettez à jours vos horaires</b-button></center>
         </b-card>
@@ -26,17 +26,37 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import datetime from 'vuejs-datetimepicker';
 import jwt_decode from 'jwt-decode';
+import DatePicker from 'vue2-datepicker'
 
 export default {
     
     name: 'TimeManager',
 
     components: {
-        datetime
+        datetime,
+        DatePicker
     },
 
     data() {
         return {
+            shortcuts: [
+                {
+                    text: 'OK',
+                    onClick: () => {
+                        this.setArrival = [new Date()],
+                        this.departure = [new Date()]
+                    }
+                }
+            ],
+            timeOptions: {
+                start: '28/09/2019 13:27:00',
+                step: '',
+                end: ''
+            },
+            lang: {
+                days: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+                months: ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jui', 'Jui', 'Aou', 'Sep', 'Oct', 'Nov', 'Dec'],
+            },
             today: moment().format('LLLL'),
             interval: null,
             chrono: null,
@@ -69,7 +89,6 @@ export default {
                     time: moment().toISOString().substring(0, moment().toISOString().length -1)
                 };
 
-                console.log(this.clocks.time)
                 axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id,  this.clocks, {
                     headers: {
                         Authorization: 'Bearer ' + localStorage.getItem('token')
@@ -118,16 +137,11 @@ export default {
 
         setWorkingTime() {
 
-            if (this.arrival != this.setArrival && this.departure != this.setDeparture) {
-                
-                this.clocks = {
-                    status: true,
-                    time: moment().toISOString().substring(0, moment(this.setArrival).toISOString().length -1)
-                };
-
-                axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id,  this.clocks, {
+            if (this.setArrival != null && this.setDeparture != null) {
+                // SET L ARRIVEE
+                axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id, {status: true, time: this.setArrival}, {
                     headers: {
-                        Authorization: 'Bearer ' + localStorage.getItem('token')
+                            Authorization: 'Bearer ' + localStorage.getItem('token')
                     }
                 })
                 .then((response) => {
@@ -135,28 +149,24 @@ export default {
                 })
                 .catch((error) => {
                     console.log(error);
-                })
+                });
 
-                this.clocks = {
-                    status: false,
-                    time: moment().toISOString().substring(0, moment(this.setDeparture).toISOString().length -1)
-                };
-
-                axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id,  this.clocks, {
+                // SET LE DEPART
+                axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id, {status: false, time: this.setDeparture}, {
                     headers: {
                         Authorization: 'Bearer ' + localStorage.getItem('token')
                     }
                 })
                 .then((response) => {
                     console.log(response);
+                    return;
                 })
                 .catch((error) => {
                     console.log(error);
-                })
+                });
             } else {
-                alert('VOUS NE POUVEZ PAS MODIFIER')
+                alert('Rien à mettre à jour');
             }
-            
         }
     }
 
