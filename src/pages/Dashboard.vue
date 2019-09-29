@@ -1,5 +1,5 @@
 <template>
-  <div class="hello" ref="chartdiv"></div>
+  <div class="graph" ref="chartdiv"></div>
 </template>
 
 <script>
@@ -15,11 +15,8 @@ am4core.useTheme(am4themes_animated);
 export default {
   name: 'HelloWorld',
   mounted() {
-    let chart = am4core.create(this.$refs.chardiv, am4charts.XYChart);
+    let chart = am4core.create(this.$refs.chartdiv, am4charts.XYChart);
     let token = localStorage.getItem('token');
-    if (token == null) {
-      // ya pas de token
-    }
     axios.get('http://localhost:3000/api/workingtimes/user/' +  jwt_decode(token).id, {
       headers: {Authorization: 'Bearer ' + token}
       })
@@ -75,7 +72,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.hello {
+.graph {
   width: 100%;
   height: 500px;
 }
