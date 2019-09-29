@@ -94,7 +94,7 @@ export default {
                     }
                 })
                 .then((response) => {
-                    console.log(response);
+
                 })
                 .catch((error) => {
                     console.log(error);
@@ -121,7 +121,7 @@ export default {
                     }
                 })
                 .then((response) => {
-                    console.log(response);
+
                 })
                 .catch((error) => {
                     console.log(error);
@@ -147,8 +147,6 @@ export default {
 
             if (this.statusClock == false && this.setArrival != null && this.setDeparture != null) {
 
-                console.log('coucou');
-
                 this.clocks = {
                     status: true,
                     time: this.setArrival
@@ -161,7 +159,7 @@ export default {
                     }
                 })
                 .then((response) => {
-                    console.log(response);
+
                 })
                 .catch((error) => {
                     console.log(error);
@@ -179,7 +177,6 @@ export default {
                     }
                 })
                 .then((response) => {
-                    console.log(response);
                     return;
                 })
                 .catch((error) => {

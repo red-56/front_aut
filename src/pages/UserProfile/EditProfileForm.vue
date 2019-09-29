@@ -95,7 +95,6 @@ export default {
       })
       .then((response) => {
           this.currentUser = response.data;
-          console.log(this.currentUser);
           this.firstname = this.currentUser.first_name;
           this.lastname = this.currentUser.last_name;
           this.email = this.currentUser.email;

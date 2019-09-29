@@ -201,7 +201,6 @@ export default {
             })
             .then((response) => {
                 this.members = response.data;
-                console.log(this.members.length);
                 for (var i = 0; i < this.members.length; i++) {
                     if (this.members[i].teamId == this.teamId) {
                         this.exists = true;
@@ -247,7 +246,6 @@ export default {
             })
             .then((response) => {
                 this.members = response.data;
-                console.log(this.members.length);
                 for (var i = 0; i < this.members.length; i++) {
                     if (this.members[i].teamId == this.teamId) {
                         this.exists = true;

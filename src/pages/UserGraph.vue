@@ -6,42 +6,16 @@
         </select>
 
       <!-- CASE MANAGER  -->
-        <select v-if="manager" id="listUsers">
-            <option>Choisissez un utilisateur</option>
-            <option v-for="user in myUsersInfoUnique" :key="user.id" :value="user.id" v-on:click="selectedValue">{{ user.first_name }} / {{ user.last_name }} / {{ user.role }}</option>
-        </select>
-      <br><br>
-        <!-- FOR MANAGER -->
         <select id="listTeams" v-if="manager">
             <option>Choisissez une équipe</option>
             <option v-for="team in myTeams" :key="team.id" :value="team.id" v-on:click="selectedValueTeam">{{ team.name }}</option>
         </select>
-      <br><br>
-      <table class="table table-striped table-hover" v-if="manager">
-        <thead>
-            <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Nom</th>
-            <th scope="col">Prénom</th>
-            <th scope="col">Email</th>
-            <th scope="col">Role</th>
-            <th scope="col">Options</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="myUser in myUsersInfo" :key="myUser.id">
-                <td>{{ myUser.id }}</td>
-                <td>{{ myUser.last_name }}</td>
-                <td>{{ myUser.first_name }}</td>
-                <td>{{ myUser.email }}</td>
-                <td>{{ myUser.role }}</td>
-                <td>
-                    <button v-on:click="display(myUser.id)">Afficher son graph</button>
-                </td>
-            </tr>
-        </tbody>
-      </table>
-      <br/>
+        <br><br>
+        <select id="listUsers" v-if="manager">
+            <option>Choisissez un utilisateur</option>
+            <option v-for="user in myUsersInfoUnique" :key="user.id" :value="user.id" v-on:click="selectedValueM">{{ user.first_name }} / {{ user.last_name }} / {{ user.role }}</option>
+        </select>
+        <br>
 
     <b-card bg-variant="light" text-variant="dark" border-variant="dark" title="Time Range">
       <center>
@@ -153,7 +127,12 @@ export default {
             this.userId = e.target.value;
         },
 
+        selectedValueM(e) {
+            this.userId = e.target.value;
+        },
+
         selectedValueTeam(e) {
+            this.myUsersInfoUnique = [];
             this.teamId = e.target.value;
 
             axios.get('http://localhost:3000/api/teamscontent/team/' + this.teamId, {
@@ -170,11 +149,10 @@ export default {
                             Authorization: 'Bearer ' + localStorage.getItem('token')
                         }
                     })
-                    .then(resp => {
-                        this.myUsersInfo = resp.data;
-                        console.log(this.myUsersInfo);
+                    .then((resp) => {
+                        this.myUsersInfoUnique.push(resp.data);
                     })
-                    .catch(err => {
+                    .catch((err) => {
                         console.log(err);
                     });
                 }
@@ -240,16 +218,6 @@ export default {
             }
         },
 
-        // EN TANT QUE MANAGER
-        display(id) {
-            this.userId = id;
-
-            if (this.userId == null) {
-                alert('Erreur: aucun utilisateur selectionné');
-            } else {
-                this.update_data();
-            }
-        },
         update_data() {
             var self = this;
             var query = "http://localhost:3000/api/workingtimes/user/" +  this.userId
@@ -285,7 +253,7 @@ export default {
 </script>
 
 <style>
-#listTeams {
+#listTeams, #listUsers {
     width: 80%;
     display: block;
     margin: 0 auto;
