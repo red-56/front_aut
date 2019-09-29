@@ -170,24 +170,24 @@ export default {
                 })
                 .then((response) => {
 
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-
-                this.clocks = {
-                    status: false,
-                    time: this.setDeparture
-                }
-
-                // SET LE DEPART
-                axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id, this.clocks, {
-                    headers: {
-                        Authorization: 'Bearer ' + localStorage.getItem('token')
+                    this.clocks = {
+                        status: false,
+                        time: this.setDeparture
                     }
-                })
-                .then((response) => {
-                    return;
+
+                    // SET LE DEPART
+                    axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id, this.clocks, {
+                        headers: {
+                            Authorization: 'Bearer ' + localStorage.getItem('token')
+                        }
+                    })
+                    .then((response) => {
+                        return;
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+
                 })
                 .catch((error) => {
                     console.log(error);
