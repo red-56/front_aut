@@ -120,12 +120,9 @@ export default {
                 console.log(errors);
             })
         },
-<<<<<<< HEAD
-=======
 
     
 
->>>>>>> 5bca723515d387b3a3777dec5620dfed8e5efe60
         getMyUsers() {
 
             // GET ALL THE TEAMS
@@ -173,11 +170,6 @@ export default {
                         console.log(err);
                     });
                 }
-<<<<<<< HEAD
-            }
-            // CONSOLE MY TEAMS
-            console.log(this.myTeams);
-=======
                 
 
                 for (var l = 0; l < this.myUsersInfo.length; l++){
@@ -204,7 +196,6 @@ export default {
 
             
 
->>>>>>> 5bca723515d387b3a3777dec5620dfed8e5efe60
         },
         display() {
             if (this.userId == null) {
