@@ -81,7 +81,7 @@ export default {
             if (this.chrono == null){
 
                 this.statusClock = true;
-                const now = moment.now();
+                const now = moment(moment.now()).add(1, 'hours');
                 this.arrival = moment().toISOString().substring(0, moment().toISOString().length -1)
                 this.clocks = {
                     status: true,
