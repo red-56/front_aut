@@ -11,7 +11,7 @@
         </center>
       </b-card>
       <br/>
-      <center><b-button v-on:click="display">Update le graph</b-button></center>
+      <center><b-button v-on:click="update_data">Update le graph</b-button></center>
     <div class="graph" ref="chartdiv"></div>
   </div>
 </template>
