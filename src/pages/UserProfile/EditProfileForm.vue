@@ -95,6 +95,7 @@ export default {
       })
       .then((response) => {
           this.currentUser = response.data;
+          console.log(this.currentUser);
           this.firstname = this.currentUser.first_name;
           this.lastname = this.currentUser.last_name;
           this.email = this.currentUser.email;
@@ -116,82 +117,78 @@ export default {
           text: 'Veuillez saisir le mot de passe',
           footer: 'Merci de réessayez'
         });
-      } else {
-        this.user.first_name = this.firstname;
-      this.user.last_name = this.lastname;
-      this.user.password = this.password;
-      this.user.email = this.email;
-
-      console.log(this.currentUser);
-
-      axios.put('http://localhost:3000/api/users/' + jwt_decode(localStorage.getItem('token')).id, this.user, {
-        headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token')
-        }
-      })
-      .then((response) => {
-          Swal.fire(
-            'Félicitation',
-            'Profil mis à jour!',
-            'success'
-          );
-      })
-      .catch((e) => {
-        Swal.fire({
-          type: 'error',
-          title: 'Erreur',
-          text: 'Mise à jour du compte impossible',
-          footer: 'Merci de réessayez'
-        });
-        console.log(e);
-      })
+        return;
       }
 
-      
+      axios.post('http://localhost:3000/api/users/sign_in', {email: this.email, password: this.password})
+      .then((response) => {
+        if (response.data.token != null) {
+          this.user.first_name = this.firstname;
+          this.user.last_name = this.lastname;
+          this.user.password = this.password;
+          this.user.email = this.email;
+
+          axios.put('http://localhost:3000/api/users/' + jwt_decode(localStorage.getItem('token')).id, this.user, {
+            headers: {
+              Authorization: 'Bearer ' + localStorage.getItem('token')
+            }
+          })
+          .then((response) => {
+            Swal.fire(
+              'Félicitation',
+              'Profil mis à jour!',
+              'success'
+            );
+            return;
+          })
+          .catch((e) => {
+            Swal.fire({
+              type: 'error',
+              title: 'Erreur',
+              text: 'Mise à jour du compte impossible',
+              footer: 'Merci de réessayez'
+            });
+            console.log(e);
+          })
+        } else {
+          alert('Mot de passe incorrect');
+          return;
+        }
+      })
+      .catch((error) => {
+        alert('Erreur: mot de passe incorrect');
+        return;
+      })
     },
 
     remove() {
+      // CAS ADMIN
       if (jwt_decode(localStorage.getItem('token')).id == 1) {
         alert('Vous ne pouvez pas supprimer votre compte, vous êtes Administrateur');
         return;
-      } else if (jwt_decode(localStorage.getItem('token')).id != 1 && this.password == null) {
-          Swal.fire({
+      }
+
+      if (jwt_decode(localStorage.getItem('token')).id != 1 && this.password == null) {
+        Swal.fire({
           type: 'error',
           title: 'Erreur',
           text: 'Veuillez saisir le mot de passe',
           footer: 'Merci de réessayez'
         });
-      } else if (jwt_decode(localStorage.getItem('token')).id != 1 && this.password != null)
-      Swal.fire({
-                title: 'Êtes vous sûr de vouloir supprimer votre compte ?',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Oui supprimer'
-                }).then((result) => {
-                if (result.value) {
-                    axios.delete('http://localhost:3000/api/users/' + jwt_decode(localStorage.getItem('token')).id, {
-                        headers: {
-                            Authorization: 'Bearer ' + localStorage.getItem('token')
-                        }
-                    }).then(response => {
-                        Swal.fire(
-                            'Supprimé!',
-                            'success'
-                        )
-                        localStorage.removeItem('token');
-                        router.push('/login');
-                    }).catch(err => {
-                        Swal.fire({
-                            type: 'error',
-                            title: 'Erreur',
-                            text: 'Suppression impossible'
-                        })
-                        console.log(err);
-                    });
-                }
-            })
+        return;
+      }
+      
+      axios.delete('http://localhost:3000/api/users/', jwt_decode(localStorage.getItem('token')).id, {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('token')
+        }
+      })
+      .then((resp) => {
+        alert('Supprimé');
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     }
   }
 };
