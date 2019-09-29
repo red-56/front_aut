@@ -21,8 +21,8 @@
               <i class="material-icons">power_settings_new</i>
             </md-list-item>
           </md-list> -->
-          <router-link to="/login">
-          <i class="material-icons">power_settings_new</i>
+          <router-link  to="/login">
+          <i v-on:click="logout" class="material-icons">power_settings_new</i>
           </router-link>
         </div>
       </div>
@@ -31,11 +31,15 @@
 </template>
 
 <script>
+
+import { mapActions } from 'vuex';
+
 export default {
   methods: {
     toggleSidebar() {
       this.$sidebar.displaySidebar(!this.$sidebar.showSidebar);
-    }
+    },
+    ...mapActions(["logout"])
   }
 };
 </script>
