@@ -1,6 +1,12 @@
 <template>
   <div>
-
+    <b-card-text>
+          &nbsp;&nbsp;&nbsp;Start: <date-picker format="DD/MM/YYYY HH:mm:ss" valueType="format" v-model="setStart" type="datetime" :time-picker-options="timeOptions" :lang="lang" :shortcuts="shortcuts"></date-picker>
+    </b-card-text>
+    <b-card-text>
+          &nbsp;&nbsp;&nbsp;End: &nbsp;&nbsp;<date-picker format="DD/MM/YYYY HH:mm:ss" valueType="format" v-model="setEnd" type="datetime" :time-picker-options="timeOptions" :lang="lang" :shortcuts="shortcuts"></date-picker>
+    </b-card-text>
+    <br><br><br>
     <select v-if="admin" id="listTeams">
         <option>Choisissez une équipe</option>
         <option v-for="team in myTeams" :key="team.id" :value="team.id" v-on:click="selectedValue">{{ team.name }}</option>
@@ -28,11 +34,18 @@ import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 import DashboardLayout from '@/pages';
 import moment from 'moment';
+import DatePicker from 'vue2-datepicker'
 
 am4core.useTheme(am4themes_animated);
 
 export default {
   name: 'TeamGraph',
+
+  components: {
+        DatePicker
+  },
+
+
   data() {
     return {
       admin: null,
@@ -44,7 +57,27 @@ export default {
       teamId: null,
       teamName: null,
       managerId: null,
-      nameTeam: null
+      nameTeam: null,
+      setStart: null,
+      setEnd: null,
+      shortcuts: [
+                {
+                    text: 'OK',
+                    onClick: () => {
+                        this.setArrival = [new Date()],
+                        this.departure = [new Date()]
+                    }
+                }
+            ],
+            timeOptions: {
+                start: '',
+                step: '',
+                end: ''
+            },
+            lang: {
+                days: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+                months: ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jui', 'Jui', 'Aou', 'Sep', 'Oct', 'Nov', 'Dec'],
+            },
     }
   },
   

@@ -1,21 +1,16 @@
 <template>
     <div>
-        <!-- CASE ADMIN -->
-        <select v-if="admin" id="listUsers">
+        <b-card-text>
+            &nbsp;&nbsp;&nbsp;Start: <date-picker format="DD/MM/YYYY HH:mm:ss" valueType="format" v-model="setStart" type="datetime" :time-picker-options="timeOptions" :lang="lang" :shortcuts="shortcuts"></date-picker>
+        </b-card-text>
+        <b-card-text>
+            &nbsp;&nbsp;&nbsp;End: &nbsp;&nbsp;<date-picker format="DD/MM/YYYY HH:mm:ss" valueType="format" v-model="setEnd" type="datetime" :time-picker-options="timeOptions" :lang="lang" :shortcuts="shortcuts"></date-picker>
+        </b-card-text>
+        <br><br><br>
+        <select id="listUsers">
             <option>Choisissez un utilisateur</option>
             <option v-for="user in users" :key="user.id" :value="user.id" v-on:click="selectedValue">{{ user.first_name }} / {{ user.last_name }} / {{ user.role }}</option>
         </select>
-        
-
-      <!-- CASE MANAGER  -->
-
-        <select v-if="manager" id="listUsers">
-            <option>Choisissez un utilisateur</option>
-            <option v-for="user in myUsersInfoUnique" :key="user.id" :value="user.id" v-on:click="selectedValue">{{ user.first_name }} / {{ user.last_name }} / {{ user.role }}</option>
-        </select>
-
-      
-
       <br><br>
 
       <center><button v-on:click="display">Afficher le graph</button></center>
@@ -34,11 +29,16 @@ import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 import moment from 'moment';
+import DatePicker from 'vue2-datepicker'
 
 am4core.useTheme(am4themes_animated);
 
 export default {
     name: 'UserGraph',
+
+    components: {
+        DatePicker
+    },
     data() {
         return {
             // FOR ROLES
@@ -57,6 +57,27 @@ export default {
 
             // FOR ALL
             userId: null,
+            setStart: null,
+            setEnd: null,
+
+            shortcuts: [
+                {
+                    text: 'OK',
+                    onClick: () => {
+                        this.setArrival = [new Date()],
+                        this.departure = [new Date()]
+                    }
+                }
+            ],
+            timeOptions: {
+                start: '',
+                step: '',
+                end: ''
+            },
+            lang: {
+                days: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+                months: ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jui', 'Jui', 'Aou', 'Sep', 'Oct', 'Nov', 'Dec'],
+            },
         }
     },
     created() {
@@ -86,15 +107,19 @@ export default {
         chart.scrollbarX = new am4core.Scrollbar();
         this.chart = chart; 
     },
+
     beforeDestroy() {
         if (this.chart) {
             this.chart.dispose();
         }
     },
+
     methods: {
+
         selectedValue(e) {
             this.userId = e.target.value;
         },
+
         checkRole() {
             if (jwt_decode(localStorage.getItem('token')).role == 'Administrator') {
                 this.admin = true;
@@ -106,6 +131,7 @@ export default {
                 this.manager = false;
             }
         },
+
         getUsers() {
             axios.get('http://localhost:3000/api/users', {
                 headers: {
@@ -149,44 +175,16 @@ export default {
                         }
                     })
                     .then((resp) => {
-                        this.myUsers = resp.data;
-
-        
-                        
-                        if (this.myUsers.length == 0) {
-                            console.log("team vide");
-                        } else {
-                            for (var k = 0; k < this.myUsers.length; k++) {
-                                if (this.myUsers[k].employeeId != jwt_decode(localStorage.getItem('token')).id && 
-                                this.myUsersInfo.includes(this.myUsers[k].employeeId) == false) {
-                                     this.myUsersInfo.push(this.myUsers[k].employeeId);
-                                }
-                            }
+                        for (var k = 0; k < resp.data.length; k++) {
+                            this.myUsers.push(resp.data[k]);
                         }
-
-                        
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    });
-                }
-                
-
-                for (var l = 0; l < this.myUsersInfo.length; l++){
-                    axios.get('http://localhost:3000/api/users/' + this.myUsersInfo[l], {
-                        headers: {
-                            Authorization: 'Bearer ' + localStorage.getItem('token')
-                        }
-                    })
-                    .then((resp) => {
-                        this.myUsersInfoUnique.push(resp.data);
                     })
                     .catch((err) => {
                         console.log(err);
                     });
                 }
 
-                
+                console.log(this.myUsers.length);
                
                 
             })
