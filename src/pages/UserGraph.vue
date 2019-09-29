@@ -6,14 +6,46 @@
         <b-card-text>
             &nbsp;&nbsp;&nbsp;End: &nbsp;&nbsp;<date-picker format="DD/MM/YYYY HH:mm:ss" valueType="format" v-model="setEnd" type="datetime" :time-picker-options="timeOptions" :lang="lang" :shortcuts="shortcuts"></date-picker>
         </b-card-text>
-        <br><br><br>
-        <select id="listUsers">
+        <br>
+        <select id="listTeams" v-if="admin">
             <option>Choisissez un utilisateur</option>
-            <option v-for="user in users" :key="user.id" :value="user.id" v-on:click="selectedValue">{{ user.first_name }} / {{ user.last_name }} / {{ user.role }}</option>
+            <option v-for="user in users" :key="user.id" :value="user.id" v-on:click="selectedValue">{{ user.last_name }} / {{ user.first_name }} /  {{ user.role }}</option>
+        </select>
+
+        <!-- FOR MANAGER -->
+        <select id="listTeams" v-if="manager">
+            <option>Choisissez une équipe</option>
+            <option v-for="team in myTeams" :key="team.id" :value="team.id" v-on:click="selectedValueTeam">{{ team.name }}</option>
         </select>
       <br><br>
+      <table class="table table-striped table-hover" v-if="manager">
+        <thead>
+            <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Nom</th>
+            <th scope="col">Prénom</th>
+            <th scope="col">Email</th>
+            <th scope="col">Role</th>
+            <th scope="col">Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="myUser in myUsersInfo" :key="myUser.id">
+                <td>{{ myUser.id }}</td>
+                <td>{{ myUser.last_name }}</td>
+                <td>{{ myUser.first_name }}</td>
+                <td>{{ myUser.email }}</td>
+                <td>{{ myUser.role }}</td>
+                <td>
+                    <button v-on:click="display(myUser.id)">Afficher son graph</button>
+                </td>
+            </tr>
+        </tbody>
+      </table>
 
-      <center><button v-on:click="display">Afficher le graph</button></center>
+
+
+      <center><button v-on:click="display" v-if="admin">Afficher le graph</button></center>
       <br/>
     <div class="graph" ref="chartdiv"></div>
 
@@ -45,10 +77,7 @@ export default {
             admin: null,
             manager: null,
 
-            // CASE ADMIN
             users: [],
-
-            // CASE MANAGER
             allTeams: [],
             myTeams: [],
             myUsers: [],
@@ -57,8 +86,10 @@ export default {
 
             // FOR ALL
             userId: null,
+            teamId: null,
             setStart: null,
             setEnd: null,
+            employees: [],
 
             shortcuts: [
                 {
@@ -83,7 +114,7 @@ export default {
     created() {
         this.checkRole();
         this.getUsers();
-        this.getMyUsers();
+        this.getMyTeams();
     },
     mounted() {
         let chart = am4core.create(this.$refs.chartdiv, am4charts.XYChart);
@@ -120,6 +151,37 @@ export default {
             this.userId = e.target.value;
         },
 
+        selectedValueTeam(e) {
+            this.teamId = e.target.value;
+
+            axios.get('http://localhost:3000/api/teamscontent/team/' + this.teamId, {
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+            .then((response) => {
+                this.myUsers = response.data;
+                
+                for (var i = 0; i < this.myUsers.length; i++) {
+                    axios.get('http://localhost:3000/api/users/' + this.myUsers[i].employeeId, {
+                        headers: {
+                            Authorization: 'Bearer ' + localStorage.getItem('token')
+                        }
+                    })
+                    .then(resp => {
+                        this.myUsersInfo = resp.data;
+                        console.log(this.myUsersInfo);
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        },
+
         checkRole() {
             if (jwt_decode(localStorage.getItem('token')).role == 'Administrator') {
                 this.admin = true;
@@ -147,10 +209,7 @@ export default {
             })
         },
 
-    
-
-        getMyUsers() {
-
+        getMyTeams() {
             // GET ALL THE TEAMS
             axios.get('http://localhost:3000/api/teams', {
                 headers: {
@@ -166,36 +225,24 @@ export default {
                         this.myTeams.push(this.allTeams[i]);
                     }
                 }
-
-                // GET MY USERS
-                for (var j = 0; j < this.myTeams.length; j++) {
-                    axios.get('http://localhost:3000/api/teamscontent/team/' + this.myTeams[j].id, {
-                        headers: {
-                            Authorization: 'Bearer ' + localStorage.getItem('token')
-                        }
-                    })
-                    .then((resp) => {
-                        for (var k = 0; k < resp.data.length; k++) {
-                            this.myUsers.push(resp.data[k]);
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    });
-                }
-
-                console.log(this.myUsers.length);
-               
-                
             })
-            .catch((error) => {
-                console.log(error);
+            .catch((err) => {
+                console.log(err);
             });
-
-            
-
         },
+
         display() {
+            if (this.userId == null) {
+                alert('Erreur: aucun utilisateur selectionné');
+            } else {
+                this.update_data();
+            }
+        },
+
+        // EN TANT QUE MANAGER
+        display(id) {
+            this.userId = id;
+
             if (this.userId == null) {
                 alert('Erreur: aucun utilisateur selectionné');
             } else {
@@ -233,7 +280,7 @@ export default {
 </script>
 
 <style>
-#listUsers {
+#listTeams {
     width: 80%;
     display: block;
     margin: 0 auto;
