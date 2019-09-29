@@ -17,7 +17,7 @@
         target="_blank"
         class="simple-text logo-normal"
       >
-        {{ title }}
+        {{ lastname }} {{ firstname }}
       </a>
     </div>
     <div class="sidebar-wrapper">
@@ -40,7 +40,39 @@
 <script>
 import SidebarLink from "./SidebarLink.vue";
 
+import axios from 'axios';
+import jwt_decode from 'jwt-decode';
+
 export default {
+
+  data() {
+    return {
+       lastname: null,
+      firstname: null
+    }
+  },
+   created() {
+    this.getInfo();
+  },
+  methods: {
+      getInfo() {
+      
+      axios.get('http://localhost:3000/api/users/' + jwt_decode(localStorage.getItem('token')).id, {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('token')
+        }
+      })
+      .then((response) => {
+          this.currentUser = response.data;
+          this.firstname = this.currentUser.first_name;
+          this.lastname = this.currentUser.last_name;
+      })
+      .catch((error) => {
+          console.log(error);
+      })
+    }
+  },
+
   components: {
     SidebarLink
   },
@@ -55,7 +87,7 @@ export default {
     },
     imgLogo: {
       type: String,
-      default: require("@/assets/img/logo.png")
+      default: require("@/assets/img/batman-2.png")
     },
     activeColor: {
       type: String,

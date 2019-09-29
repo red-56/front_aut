@@ -38,8 +38,13 @@
         <p>User Manager</p>
       </sidebar-link>
 
+      <sidebar-link v-on:click="logout" to="/login">
         <md-icon>power_settings_new</md-icon>
-        <button v-on:click="logout">Déconnexion</button>
+        <p v-on:click="logout" >Déconnexion</p>
+      </sidebar-link>
+
+        <!-- <md-icon>power_settings_new</md-icon>
+        <button v-on:click="logout">Déconnexion</button> -->
     </side-bar>
 
     <div class="main-panel">

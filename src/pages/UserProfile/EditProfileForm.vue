@@ -120,10 +120,7 @@ export default {
         return;
       }
 
-      axios.post('http://localhost:3000/api/users/sign_in', {email: this.email, password: this.password})
-      .then((response) => {
-        if (response.data.token != null) {
-          this.user.first_name = this.firstname;
+      this.user.first_name = this.firstname;
           this.user.last_name = this.lastname;
           this.user.password = this.password;
           this.user.email = this.email;
@@ -150,15 +147,7 @@ export default {
             });
             console.log(e);
           })
-        } else {
-          alert('Mot de passe incorrect');
-          return;
-        }
-      })
-      .catch((error) => {
-        alert('Erreur: mot de passe incorrect');
-        return;
-      })
+
     },
 
     remove() {
