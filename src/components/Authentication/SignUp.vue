@@ -40,6 +40,10 @@ export default {
     }
   },
 
+  created() {
+    localStorage.removeItem('token');
+  },
+
   components: {
     mdbInput,
     mdbBtn
