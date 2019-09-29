@@ -182,6 +182,8 @@ export default {
           'Votre compte a bien été supprimé',
           'success'
         )
+        localStorage.removeItem('token');
+        router.push('/login');
       })
       .catch((err) => {
         console.log(err);
