@@ -152,7 +152,11 @@ export default {
     remove() {
       // CAS ADMIN
       if (jwt_decode(localStorage.getItem('token')).id == 1) {
-        alert('Vous ne pouvez pas supprimer votre compte, vous êtes Administrateur');
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: 'Vous ne pouvez pas supprimer votre compte, vous êtes Administrateur!'
+        })
         return;
       }
 
@@ -172,7 +176,11 @@ export default {
         }
       })
       .then((resp) => {
-        alert('Supprimé');
+        Swal.fire(
+          'Supprimé',
+          'Votre compte a bien été supprimé',
+          'success'
+        )
       })
       .catch((err) => {
         console.log(err);

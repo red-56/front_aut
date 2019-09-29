@@ -1,19 +1,5 @@
 <template>
     <div>
-        <b-button v-b-modal.add-team class="float-right">Créer une équipe</b-button><br><br>
-        <b-modal id="add-team" ref="modal" title="Créer une équipe" @show="resetModal" @hidden="resetModal" @ok="handleOk">
-            <form ref="form" @submit.stop.prevent="handleSubmit">
-                <b-form-group label="Nom de l'équipe" label-for="teamName" invalid-feedback="Nom de l'équipe est obligatoire">
-                    <b-form-input id="teamName" v-model="teamName" required></b-form-input>
-                </b-form-group>
-                <b-form-group label="Choisissez un employé" invalid-feedback="Vous devez choisir un employé">
-                    <b-form-select v-model="selected">
-                        <option v-for="manager in managers" :key="manager.id" :value="manager.id" v-on:click="selectedValue">{{ manager.first_name }}</option>
-                    </b-form-select>
-                </b-form-group>
-            </form>
-        </b-modal>
-
         <table class="table table-striped table-hover">
             <thead class="thead-dark">
                 <tr>
@@ -151,44 +137,6 @@ export default {
             }
             
         },
-
-        // FOR MODAL TEAM ###############################################################
-
-        resetModal() {
-            this.teamName = '';
-            this.selected = null;
-        },
-
-        handleOk(bvModalEvt) {
-          // Prevent modal from closing
-          bvModalEvt.preventDefault()
-          // Trigger submit handler
-          this.handleSubmit()
-        },
-
-        handleSubmit() {
-
-            this.team = {
-                name: this.teamName,
-                managerId: this.managerId
-            }
-
-            axios.post('http://localhost:3000/api/teams', this.team, {
-                headers: {
-                    Authorization: 'Bearer ' + localStorage.getItem('token')
-                }
-            })
-            .then((response) => {
-                alert('Equipe créée avec succès');
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-            this.$nextTick(() => {
-                this.$refs.modal.hide()
-            })
-        },
-        
     }
 }
 </script>

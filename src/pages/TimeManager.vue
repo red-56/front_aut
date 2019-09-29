@@ -136,12 +136,22 @@ export default {
         setWorkingTime() {
 
             if (this.chrono == null && (this.setDeparture == null || this.setArrival == null)) {
-                alert('rien à mettre à jour');
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: 'Erreur: rien à mettre à jour!',
+                    footer: 'Merci de réessayez'
+                })
                 return;
             }
 
             if (this.chrono != null && (this.setDeparture == null || this.setArrival == null)) {
-                alert('Vous ne pouvez pas mettre à jour car le chronomètre tourne toujours');
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: 'Erreur: Vous ne pouvez pas mettre à jour, le chronomètre tourne toujours',
+                    footer: 'Merci de le mettre à jour après avoir fini votre travail'
+                })
                 return;
             }
 
@@ -183,7 +193,12 @@ export default {
                     console.log(error);
                 });
             } else {
-                alert('Rien à mettre à jour');
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: 'Erreur: rien à mettre à jour',
+                    footer: 'Merci de réessayez'
+                })
             }
 
         }

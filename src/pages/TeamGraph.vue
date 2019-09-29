@@ -158,7 +158,12 @@ export default {
     },
     display() {
       if (this.teamId == null) {
-        alert('Erreur: aucune team selectionnée');
+        Swal.fire({
+                        type: 'error',
+                        title: 'Erreur',
+                        text: "Aucune équipe selectionnée",
+                        footer: 'Merci de réessayez'
+                    })
       } else {
         this.update_data();
       }

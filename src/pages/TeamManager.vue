@@ -178,13 +178,22 @@ export default {
                 }
             })
             .then((response) => {
-                alert('Equipe ajoutée avec succès');
+                Swal.fire(
+                    'Félicitation!',
+                    'Equipe ajoutée avec succès',
+                    'success'
+                )
             })
             .catch((error) => {
                 console.log(error);
             });
         } else if (this.teamName == "" || this.teamName == null && this.managerId == null){
-            alert('Erreur: Nom de l equipe ou manager non renseigné');
+            Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: "Erreur: nom de l'équipe ou manager non renseigné",
+                footer: 'Merci de réessayez</a>'
+            })
         }
     },
 
@@ -215,13 +224,26 @@ export default {
                     }
                 })
                 .then(r => {
-                    alert('ajouté avec succès')
+                    Swal.fire(
+                        'Félicitation!',
+                        'Employé ajouté avec succès',
+                        'success'
+                    )
                 })
                 .catch(e => {
-                    alert('erreur lors de l ajout');
+                    Swal.fire({
+                        type: 'error',
+                        title: 'Erreur',
+                        text: "Erreur lors de l'ajout",
+                        footer: 'Merci de réessayez'
+                    })
                 });
             } else {
-                alert('Existe déjà');
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: 'Erreur: cet employé existe déjà dans cette équipe'
+                })
             }
                 
             })
@@ -260,13 +282,27 @@ export default {
                     }
                 })
                 .then(r => {
-                    alert('supprimé avec succès')
+                    Swal.fire(
+                        'Félicitation!',
+                        "Employé supprimé de l'équipe avec succès",
+                        'success'
+                    )
                 })
                 .catch(e => {
-                    alert('erreur lors de la suppression');
+                    Swal.fire({
+                        type: 'error',
+                        title: 'Erreur',
+                        text: "Erreur lors de la suppression",
+                        footer: 'Merci de réessayez'
+                    })
                 });
             } else {
-                alert('cet employé n existe meme pas dans cette équipe');
+                Swal.fire({
+                        type: 'error',
+                        title: 'Erreur',
+                        text: "Cet employé n'existe même pas dans cette équipe",
+                        footer: 'Merci de réessayez'
+                })
             }
                 
             })

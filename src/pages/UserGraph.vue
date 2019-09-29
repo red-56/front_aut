@@ -212,7 +212,12 @@ export default {
 
         display() {
             if (this.userId == null) {
-                alert('Erreur: aucun utilisateur selectionné');
+                Swal.fire({
+                        type: 'error',
+                        title: 'Erreur',
+                        text: "Aucun employé n'a été sélectionné",
+                        footer: 'Merci de réessayez'
+                    })
             } else {
                 this.update_data();
             }
