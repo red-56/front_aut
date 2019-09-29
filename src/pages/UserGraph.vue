@@ -1,9 +1,8 @@
 <template>
     <div>
-        <!-- CASE ADMIN -->
-        <select v-if="admin" id="listUsers">
+        <select id="listTeams" v-if="admin">
             <option>Choisissez un utilisateur</option>
-            <option v-for="user in users" :key="user.id" :value="user.id" v-on:click="selectedValue">{{ user.first_name }} / {{ user.last_name }} / {{ user.role }}</option>
+            <option v-for="user in users" :key="user.id" :value="user.id" v-on:click="selectedValue">{{ user.last_name }} / {{ user.first_name }} /  {{ user.role }}</option>
         </select>
 
       <!-- CASE MANAGER  -->
@@ -12,6 +11,38 @@
             <option v-for="user in myUsersInfoUnique" :key="user.id" :value="user.id" v-on:click="selectedValue">{{ user.first_name }} / {{ user.last_name }} / {{ user.role }}</option>
         </select>
       <br><br>
+        <!-- FOR MANAGER -->
+        <select id="listTeams" v-if="manager">
+            <option>Choisissez une équipe</option>
+            <option v-for="team in myTeams" :key="team.id" :value="team.id" v-on:click="selectedValueTeam">{{ team.name }}</option>
+        </select>
+      <br><br>
+      <table class="table table-striped table-hover" v-if="manager">
+        <thead>
+            <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Nom</th>
+            <th scope="col">Prénom</th>
+            <th scope="col">Email</th>
+            <th scope="col">Role</th>
+            <th scope="col">Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="myUser in myUsersInfo" :key="myUser.id">
+                <td>{{ myUser.id }}</td>
+                <td>{{ myUser.last_name }}</td>
+                <td>{{ myUser.first_name }}</td>
+                <td>{{ myUser.email }}</td>
+                <td>{{ myUser.role }}</td>
+                <td>
+                    <button v-on:click="display(myUser.id)">Afficher son graph</button>
+                </td>
+            </tr>
+        </tbody>
+      </table>
+      <br/>
+
     <b-card bg-variant="light" text-variant="dark" border-variant="dark" title="Time Range">
       <center>
       <b-card-text>
@@ -23,10 +54,8 @@
       </center>
     </b-card>
     <br/>
-      <center><b-button v-on:click="display">Afficher le graph</b-button></center>
-      <br/>
+    <center><b-button v-on:click="display">Afficher le graph</b-button></center>
     <div class="graph" ref="chartdiv"></div>
-
     </div>
 </template>
 
@@ -56,10 +85,7 @@ export default {
             admin: null,
             manager: null,
 
-            // CASE ADMIN
             users: [],
-
-            // CASE MANAGER
             allTeams: [],
             myTeams: [],
             myUsers: [],
@@ -92,7 +118,7 @@ export default {
     created() {
         this.checkRole();
         this.getUsers();
-        this.getMyUsers();
+        this.getMyTeams();
     },
     mounted() {
         let chart = am4core.create(this.$refs.chartdiv, am4charts.XYChart);
@@ -116,6 +142,7 @@ export default {
         chart.scrollbarX = new am4core.Scrollbar();
         this.chart = chart; 
     },
+
     beforeDestroy() {
         if (this.chart) {
             this.chart.dispose();
@@ -125,6 +152,38 @@ export default {
         selectedValue(e) {
             this.userId = e.target.value;
         },
+
+        selectedValueTeam(e) {
+            this.teamId = e.target.value;
+
+            axios.get('http://localhost:3000/api/teamscontent/team/' + this.teamId, {
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+            .then((response) => {
+                this.myUsers = response.data;
+                
+                for (var i = 0; i < this.myUsers.length; i++) {
+                    axios.get('http://localhost:3000/api/users/' + this.myUsers[i].employeeId, {
+                        headers: {
+                            Authorization: 'Bearer ' + localStorage.getItem('token')
+                        }
+                    })
+                    .then(resp => {
+                        this.myUsersInfo = resp.data;
+                        console.log(this.myUsersInfo);
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        },
+
         checkRole() {
             if (jwt_decode(localStorage.getItem('token')).role == 'Administrator') {
                 this.admin = true;
@@ -136,6 +195,7 @@ export default {
                 this.manager = false;
             }
         },
+
         getUsers() {
             axios.get('http://localhost:3000/api/users', {
                 headers: {
@@ -150,7 +210,7 @@ export default {
                 console.log(errors);
             })
         },
-        getMyUsers() {
+        getMyTeams() {
             // GET ALL THE TEAMS
             axios.get('http://localhost:3000/api/teams', {
                 headers: {
@@ -166,64 +226,24 @@ export default {
                         this.myTeams.push(this.allTeams[i]);
                     }
                 }
-
-                // GET MY USERS
-                for (var j = 0; j < this.myTeams.length; j++) {
-                    axios.get('http://localhost:3000/api/teamscontent/team/' + this.myTeams[j].id, {
-                        headers: {
-                            Authorization: 'Bearer ' + localStorage.getItem('token')
-                        }
-                    })
-                    .then((resp) => {
-                        this.myUsers = resp.data;
-
-        
-                        
-                        if (this.myUsers.length == 0) {
-                            console.log("team vide");
-                        } else {
-                            for (var k = 0; k < this.myUsers.length; k++) {
-                                if (this.myUsers[k].employeeId != jwt_decode(localStorage.getItem('token')).id && 
-                                this.myUsersInfo.includes(this.myUsers[k].employeeId) == false) {
-                                     this.myUsersInfo.push(this.myUsers[k].employeeId);
-                                }
-                            }
-                        }
-
-                        
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    });
-                }
-                
-
-                for (var l = 0; l < this.myUsersInfo.length; l++){
-                    axios.get('http://localhost:3000/api/users/' + this.myUsersInfo[l], {
-                        headers: {
-                            Authorization: 'Bearer ' + localStorage.getItem('token')
-                        }
-                    })
-                    .then((resp) => {
-                        this.myUsersInfoUnique.push(resp.data);
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    });
-                }
-
-                
-               
-                
             })
-            .catch((error) => {
-                console.log(error);
+            .catch((err) => {
+                console.log(err);
             });
-
-            
-
         },
+
         display() {
+            if (this.userId == null) {
+                alert('Erreur: aucun utilisateur selectionné');
+            } else {
+                this.update_data();
+            }
+        },
+
+        // EN TANT QUE MANAGER
+        display(id) {
+            this.userId = id;
+
             if (this.userId == null) {
                 alert('Erreur: aucun utilisateur selectionné');
             } else {
@@ -265,7 +285,7 @@ export default {
 </script>
 
 <style>
-#listUsers {
+#listTeams {
     width: 80%;
     display: block;
     margin: 0 auto;

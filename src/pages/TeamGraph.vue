@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <select v-if="admin" id="listTeams">
         <option>Choisissez une équipe</option>
         <option v-for="team in myTeams" :key="team.id" :value="team.id" v-on:click="selectedValue">{{ team.name }}</option>
