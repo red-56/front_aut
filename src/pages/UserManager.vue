@@ -14,7 +14,7 @@
             </form>
         </b-modal>
 
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover table-responsive">
             <thead class="thead-dark">
                 <tr>
                 <th scope="col">Id</th>

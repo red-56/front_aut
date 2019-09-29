@@ -1,53 +1,54 @@
 <template>
   <div>
-    <!-- FOR ADMIN -->
+      <!-- AJOUT D'UNE EQUIPE QUE POUR L'ADMIN -->
+      <h3 class="mt-3 text-center" v-if="admin">Ajouter une équipe</h3>
+      <hr v-if="admin">
+      <div class="row" v-if="admin">
+            <div class="col">
+                <label>Nom de l'équipe</label>
+                <input type="text" class="form-control" v-model="teamName" required>
+            </div>
+            <div class="col">
+                <label>L'affecter à un manager</label><br>
+                <select id="listManagers" required>
+                    <option>Choisissez un manager</option>
+                    <option v-for="manager in managers" :key="manager.id" :value="manager.id" v-on:click="selectedValueManager">{{ manager.first_name }} {{ manager.last_name }}</option>
+                </select>
+            </div>
+      </div>
+      <center><button class="btn btn-info mt-2" @click="addTeam" v-if="admin">Ajouter</button></center>
+      <hr v-if="admin">
+      <!-- FIN DE L'AJOUT D'UNE EQUIPE QUI CONCERNE L'ADMIN -->
 
-    <select v-if="admin" id="listTeams">
-      <option>Choisissez une équipe</option>
-      <option v-for="team in teams" :key="team.id" :value="team.id" v-on:click="selectedValueTeam">{{ team.name }}</option>
-    </select>
-
-    <br><br><br>
-
-    <select v-if="admin" id="listTeams">
-      <option>Choisissez un employé à ajouter/supprimer dans/de l'équipe choisie</option>
-      <option v-for="employee in employees" :key="employee.id" :value="employee.id" v-on:click="selectedValueEmployee">{{ employee.first_name }} {{ employee.last_name }} /{{ employee.role }}</option>
-    </select>
-
-    <!-- FOR MANAGER -->
-
-    <select v-if="manager" id="listTeams">
-      <option>Choisissez une équipe</option>
-      <option v-for="myTeam in myTeams" :key="myTeam.id" :value="myTeam.id" v-on:click="selectedValueMyTeam">{{ myTeam.name }}</option>
-    </select>
-
-    <br><br><br>
-
-    <select v-if="manager" id="listTeams">
-      <option>Choisissez un employé à ajouter/supprimer dans/de l'équipe choisie</option>
-      <option v-for="employee in myEmployeesInfoUniques" :key="employee.id" :value="employee.id" v-on:click="selectedValueMyEmployee">{{ employee.first_name }} {{ employee.last_name }} /{{ employee.role }}</option>
-    </select>
-
-    <!-- For editing team -->
-    <b-modal id="edit-team" ref="modal" title="Modifier le nom de l'équipe" @show="resetModal" @hidden="resetModal" @ok="handleOk">
-        <form ref="form" @submit.stop.prevent="handleSubmit">
-            <b-form-group label="Nom de l'équipe" label-for="teamName" invalid-feedback="Nom de l'équipe est obligatoire">
-                <b-form-input id="teamName" v-model="teamName" required></b-form-input>
-            </b-form-group>
-        </form>
-    </b-modal>
-
-    <br>
-    <br>
-    <center>
-        <!-- ADMIN -->
-      <button v-on:click="addTo" v-if="admin">Ajouter à</button>&nbsp;&nbsp;&nbsp;
-      <button v-on:click="removeFrom" v-if="admin">Supprimer de:</button>&nbsp;&nbsp;&nbsp;
-      <!-- MANAGER -->
-      <button v-on:click="addTo" v-if="manager">Ajouter à</button>&nbsp;&nbsp;&nbsp;
-      <button v-on:click="removeFrom" v-if="manager">Supprimer de:</button>&nbsp;&nbsp;&nbsp;
-      <button v-b-modal.edit-team >Editer une équipe</button>
-    </center>
+      <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Nom</th>
+            <th scope="col">Prénom</th>
+            <th scope="col">Email</th>
+            <th scope="col">Role</th>
+            <th scope="col">Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="employee in employees" :key="employee.id">
+                <td>{{ employee.id }}</td>
+                <td>{{ employee.last_name }}</td>
+                <td>{{ employee.first_name }}</td>
+                <td>{{ employee.email }}</td>
+                <td>{{ employee.role }}</td>
+                <td>
+                    <button v-on:click="addToTeam(employee.id)">Ajouter à</button> | 
+                    <button v-on:click="removeFromTeam(employee.id)">Supprimer de </button> |
+                    <select>
+                        <option>Choisissez une équipe</option>
+                        <option v-for="team in teams" :key="team.id" :value="team.id" v-on:click="selectedValueTeam">{{ team.name }}</option>
+                    </select>
+                </td>
+            </tr>
+        </tbody>
+      </table>
   </div>
 </template>
 
@@ -66,36 +67,33 @@ export default {
       manager: false,
 
       // FOR ADMIN
-      users: [],
+      managers: [],
       teams: [],
-      employees: [],
-      employeeId: null,
-      teamId: null,
+      managerId: null,
 
-      // MANAGER
+      // FOR MANAGER
       myTeams: [],
-      myEmployees: [],
-      myEmployeesInfo: [],
-      myEmployeesInfoUniques: [],
-      myEmployeeId: null,
-      myTeamId: null,
 
       // FOR ALL
-
+      users: [],
+      employees: [],
+      teamName: null,
+      teamId: null,
       members: [],
-      into: null,
-      teamName: '',
-      nameofTeam: ''
+      exists: false,
+
+      
     };
   },
 
   created() {
     this.checkRole();
-    this.getEmployees();
+    this.getEmployeesAndManagers();
     this.getTeams();
   },
 
   methods: {
+
     checkRole() {
       if (jwt_decode(localStorage.getItem("token")).role == "Administrator") {
         this.admin = true;
@@ -109,376 +107,191 @@ export default {
       }
     },
 
-    selectedValueEmployee(e) {
-        this.employeeId = e.target.value
+    getTeams() {
+        axios.get('http://localhost:3000/api/teams', {
+            headers: {
+                Authorization: 'Bearer ' + localStorage.getItem('token')
+            }
+        })
+        .then((response) => {
+            this.teams = response.data;
+
+            // CASE MANAGER
+            for (var i = 0; i < this.teams.length; i++) {
+                if (this.teams[i].managerId == jwt_decode(localStorage.getItem('token')).id) {
+                    this.myTeams.push(this.teams[i]);
+                }
+            }
+
+            if (this.manager) {
+                this.teams = this.myTeams;
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    },
+
+    getEmployeesAndManagers() {
+        axios.get('http://localhost:3000/api/users', {
+            headers: {
+                Authorization: 'Bearer ' + localStorage.getItem('token')
+            }
+        })
+        .then((response) => {
+            this.users = response.data;
+            this.users.splice(0, 1);
+
+            // GET ONLY MANAGERS
+            for (var i = 0; i < this.users.length; i++) {
+                if (this.users[i].role == 'Manager') {
+                    this.managers.push(this.users[i]);
+                }
+            }
+
+            // GET ONLY EMPLOYEES
+            for (var j = 0; j < this.users.length; j++) {
+                if (this.users[j].role == 'Employee') {
+                    this.employees.push(this.users[j]);
+                }
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    },
+
+    selectedValueManager(e) {
+        this.managerId = e.target.value;
     },
 
     selectedValueTeam(e) {
-        this.teamId = e.target.value
+        this.teamId = e.target.value;
     },
 
-    selectedValueMyEmployee(e) {
-        this.myEmployeeId = e.target.value;
-    },
+    addTeam() {
 
-    selectedValueMyTeam(e) {
-        this.myTeamId = e.target.value;
-    },
-
-    getEmployees() {
-      axios
-        .get("http://localhost:3000/api/users", {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
-          }
-        })
-        .then(response => {
-          // RETRIEVE USERS WITHOUT ADMIN
-          this.users = response.data;
-          this.users.splice(0, 1);
-
-          // RETRIEVE EMPLOYEES
-
-          if (this.admin) {
-                for (var i = 0; i < this.users.length; i++) {
-                    if (this.users[i].role == "Employee") {
-                        this.employees.push(this.users[i]);
-                    }
-                }
-          }
-          
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    },
-
-    getTeams() {
-      axios
-        .get("http://localhost:3000/api/teams", {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
-          }
-        })
-        .then(response => {
-          // CHECK IF ADMIN OR MANAGER
-          if (this.admin) {
-            this.teams = response.data;
-          } else if (this.manager) {
-            this.teams = response.data;
-
-            for (var i = 0; i < this.teams.length; i++) {
-              if (this.teams[i].managerId == jwt_decode(localStorage.getItem("token")).id) {
-                this.myTeams.push(this.teams[i]);
-              }
-            }
-          }
-
-            for (var j = 0; j < this.myTeams.length; j++) {
-                    axios.get('http://localhost:3000/api/teamscontent/team/' + this.myTeams[j].id, {
-                        headers: {
-                            Authorization: 'Bearer ' + localStorage.getItem('token')
-                        }
-                    })
-                    .then((resp) => {
-                        this.myEmployees = resp.data;
-
-        
-                        
-                        if (this.myEmployees.length == 0) {
-                            console.log("team vide");
-                        } else {
-                            for (var k = 0; k < this.myEmployees.length; k++) {
-                                if (this.myEmployees[k].employeeId != jwt_decode(localStorage.getItem('token')).id && 
-                                this.myEmployeesInfo.includes(this.myEmployees[k].employeeId) == false) {
-                                     this.myEmployeesInfo.push(this.myEmployees[k].employeeId);
-                                }
-                            }
-                        }
-
-                        
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    });
-            }
-
-            for (var l = 0; l < this.myEmployeesInfo.length; l++){
-                    axios.get('http://localhost:3000/api/users/' + this.myEmployeesInfo[l], {
-                        headers: {
-                            Authorization: 'Bearer ' + localStorage.getItem('token')
-                        }
-                    })
-                    .then((resp) => {
-                        this.myEmployeesInfoUniques.push(resp.data);
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    });
-                }
-
-
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    },
-
-    addTo() {
-        if (this.employeeId == null && this.teamId == null) {
-            alert('Erreur: employé ou équipe non selectionné(e)s')
-        } else {
-            // RECUPERER LES EQUIPES OU CET EMPLOYE APPARTIENT
-            axios.get('http://localhost:3000/api/teamscontent/user/' + this.employeeId, {
+        if (this.teamName != null && this.managerId != null) {
+            axios.post('http://localhost:3000/api/teams', {name: this.teamName, managerId: this.managerId}, {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
                 }
             })
             .then((response) => {
+                alert('Equipe ajoutée avec succès');
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        } else if (this.teamName == "" || this.teamName == null && this.managerId == null){
+            alert('Erreur: Nom de l equipe ou manager non renseigné');
+        }
+    },
 
+    addToTeam(id) {
+        if (this.teamId == null) {
+            alert('Aucune équipe choisie');
+        } else {
+
+            // AVOIR LES EQUIPES A LAQUELLE APPARTIENT L EMPLOYE CHOISI
+            axios.get('http://localhost:3000/api/teamscontent/user/' + id, {
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+            .then((response) => {
                 this.members = response.data;
-
+                console.log(this.members.length);
                 for (var i = 0; i < this.members.length; i++) {
                     if (this.members[i].teamId == this.teamId) {
-                        alert('User existe deja dans cette team');
-                        return;
+                        this.exists = true;
+                        break;
                     }
                 }
 
-                axios.post('http://localhost:3000/api/teamscontent', {teamId: this.teamId, employeeId: this.employeeId}, {
+            if (!this.exists) {
+                axios.post('http://localhost:3000/api/teamscontent', {teamId: this.teamId, employeeId: id}, {
                     headers: {
                         Authorization: 'Bearer ' + localStorage.getItem('token')
                     }
                 })
-                .then((resp) => {
-                    console.log(resp);
+                .then(r => {
+                    alert('ajouté avec succès')
                 })
-                .catch((err) => {
-                    console.log(err);
-                })
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-        }
-    },
-
-    addToMyTeam() {
-
-        if (this.myEmployeeId == null && this.myTeamId == null) {
-            alert('Erreur: employé ou équipe non selectionné(e)s')
-        } else {
-            // RECUPERER LES EQUIPES OU CET EMPLOYE APPARTIENT
-            axios.get('http://localhost:3000/api/teamscontent/user/' + this.myEmployeeId, {
-                headers: {
-                    Authorization: 'Bearer ' + localStorage.getItem('token')
-                }
-            })
-            .then((response) => {
-
-                this.members = response.data;
-
-                for (var i = 0; i < this.members.length; i++) {
-                    if (this.members[i].teamId == this.myTeamId) {
-                        alert('User existe deja dans cette team');
-                        return;
-                    }
-                }
-
-                axios.post('http://localhost:3000/api/teamscontent', {teamId: this.myTeamId, employeeId: this.myEmployeeId}, {
-                    headers: {
-                        Authorization: 'Bearer ' + localStorage.getItem('token')
-                    }
-                })
-                .then((resp) => {
-                    console.log(resp);
-                })
-                .catch((err) => {
-                    console.log(err);
-                })
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-        }
-
-    },
-
-    removeFrom() {
-        if (this.employeeId == null && this.teamId == null) {
-            alert('Erreur: employé ou équipe non selectionné(e)s')
-        } else {
-            // RECUPERER LES EQUIPES OU CET EMPLOYE APPARTIENT
-            axios.get('http://localhost:3000/api/teamscontent/user/' + this.employeeId, {
-                headers: {
-                    Authorization: 'Bearer ' + localStorage.getItem('token')
-                }
-            })
-            .then((response) => {
-
-                this.members = response.data;
-
-                for (var i = 0; i < this.members.length; i++) {
-                    if (this.members[i].teamId == this.teamId) {
-                        axios.delete('http://localhost:3000/api/team/' + this.teamId + '/user/' + this.employeeId, {
-                            headers: {
-                                Authorization: 'Bearer ' + localStorage.getItem('token')
-                            }
-                        })
-                        .then((resp) => {
-                            console.log(resp);
-                            alert('Employé supprimé avec succès');
-                            return;
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                        })
-                    }
-                }
-                alert('Erreur de suppression: Cet utilisateur n existe meme pas dans cette team');
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-        }
-    },
-
-    removeFromMyTeam() {
-        if (this.myEmployeeId == null && this.myTeamId == null) {
-            alert('Erreur: employé ou équipe non selectionné(e)s')
-        } else {
-            // RECUPERER LES EQUIPES OU CET EMPLOYE APPARTIENT
-            axios.get('http://localhost:3000/api/teamscontent/user/' + this.myEmployeeId, {
-                headers: {
-                    Authorization: 'Bearer ' + localStorage.getItem('token')
-                }
-            })
-            .then((response) => {
-
-                this.members = response.data;
-
-                for (var i = 0; i < this.members.length; i++) {
-                    if (this.members[i].myTeamId == this.teamId) {
-                        axios.delete('http://localhost:3000/api/team/' + this.myTeamId + '/user/' + this.myEmployeeId, {
-                            headers: {
-                                Authorization: 'Bearer ' + localStorage.getItem('token')
-                            }
-                        })
-                        .then((resp) => {
-                            console.log(resp);
-                            alert('Employé supprimé avec succès');
-                            return;
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                        })
-                    }
-                }
-                alert('Erreur de suppression: Cet utilisateur n existe meme pas dans cette team');
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-        }
-    },
-
-    // FOR MODAL TEAM ###############################################################
-
-        resetModal() {
-            
-            if (this.admin) {
-                axios.get('http://localhost:3000/api/teams/' + this.teamId, {
-                    headers: {
-                        Authorization: 'Bearer ' + localStorage.getItem('token')
-                    }
-                })
-                .then((response) => {
-                    this.nameofTeam = response.data.name;
-                    this.teamName = this.nameofTeam
-                })
-                .catch((error) => {
-                    console.log(error);
+                .catch(e => {
+                    alert('erreur lors de l ajout');
                 });
-            } else if (this.manager) {
-                axios.get('http://localhost:3000/api/teams/' + this.myTeamId, {
-                    headers: {
-                        Authorization: 'Bearer ' + localStorage.getItem('token')
-                    }
-                })
-                .then((response) => {
-                    this.nameofTeam = response.data.name;
-                    this.teamName = this.nameofTeam
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+            } else {
+                alert('Existe déjà');
             }
-
-            
-        },
-
-        handleOk(bvModalEvt) {
-          // Prevent modal from closing
-          bvModalEvt.preventDefault()
-          // Trigger submit handler
-          this.handleSubmit()
-        },
-
-        handleSubmit() {
-
-            if (this.admin) {
-
-                axios.get('http://localhost:3000/api/teams/' + this.teamId, {
-                    headers: {
-                        Authorization: 'Bearer ' + localStorage.getItem('token')
-                    }
-                })
-                .then((response) => {
-                    this.managerId = response.data.managerId;
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
                 
-
-                axios.put('http://localhost:3000/api/teams/' + this.teamId, {name: this.teamName, managerId: this.managerId}, {
-                    headers: {
-                        Authorization: 'Bearer ' + localStorage.getItem('token')
-                    }
-                })
-                .then((response) => {
-                    alert('Mise à jour réussie')
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-            } else if (this.manager) {
-                axios.put('http://localhost:3000/api/teams/' + this.myTeamId, {name: this.teamName, managerId: jwt_decode(localStorage.getItem('token')).id}, {
-                    headers: {
-                        Authorization: 'Bearer ' + localStorage.getItem('token')
-                    }
-                })
-                .then((response) => {
-                    alert('Mise à jour réussie')
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-            }
-
-
-            this.$nextTick(() => {
-                this.$refs.modal.hide()
             })
-        },
+            .catch((error) => {
+                console.log(error);
+            });
+        }
+
+        this.members = [];
+        this.exists = false;
+    },
+
+    removeFromTeam(id){
+        if (this.teamId == null) {
+            alert('Aucune équipe choisie');
+        } else {
+            // AVOIR LES EQUIPES A LAQUELLE APPARTIENT L EMPLOYE CHOISI
+            axios.get('http://localhost:3000/api/teamscontent/user/' + id, {
+                headers: {
+                    Authorization: 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+            .then((response) => {
+                this.members = response.data;
+                console.log(this.members.length);
+                for (var i = 0; i < this.members.length; i++) {
+                    if (this.members[i].teamId == this.teamId) {
+                        this.exists = true;
+                        break;
+                    }
+                }
+
+            if (this.exists) {
+                axios.delete('http://localhost:3000/api/teamscontent/team/' + this.teamId + '/user/' + id, {
+                    headers: {
+                        Authorization: 'Bearer ' + localStorage.getItem('token')
+                    }
+                })
+                .then(r => {
+                    alert('supprimé avec succès')
+                })
+                .catch(e => {
+                    alert('erreur lors de la suppression');
+                });
+            } else {
+                alert('cet employé n existe meme pas dans cette équipe');
+            }
+                
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        }
+
+        this.members = [];
+        this.exists = false;
+    }
   }
-};
+}
 </script>
 
 <style>
-#listTeams {
-  width: 80%;
+#listManagers {
+  width: 40%;
   display: block;
   margin: 0 auto;
+}
+
+#listTeams {
+    width: 40px;
 }
 </style>
