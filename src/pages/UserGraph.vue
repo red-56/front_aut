@@ -5,20 +5,25 @@
             <option>Choisissez un utilisateur</option>
             <option v-for="user in users" :key="user.id" :value="user.id" v-on:click="selectedValue">{{ user.first_name }} / {{ user.last_name }} / {{ user.role }}</option>
         </select>
-        
 
       <!-- CASE MANAGER  -->
-
         <select v-if="manager" id="listUsers">
             <option>Choisissez un utilisateur</option>
             <option v-for="user in myUsersInfoUnique" :key="user.id" :value="user.id" v-on:click="selectedValue">{{ user.first_name }} / {{ user.last_name }} / {{ user.role }}</option>
         </select>
-
-      
-
       <br><br>
-
-      <center><button v-on:click="display">Afficher le graph</button></center>
+    <b-card bg-variant="light" text-variant="dark" border-variant="dark" title="Time Range">
+      <center>
+      <b-card-text>
+        Start: <date-picker format="YYYY-MM-DD HH:mm:ss" valueType="format" v-model="start" type="datetime" :time-picker-options="timeOptions" :lang="lang" :shortcuts="shortcuts"></date-picker>
+      </b-card-text>
+      <b-card-text>
+        End: <date-picker format="YYYY-MM-DD HH:mm:ss" valueType="format" v-model="end" type="datetime" :time-picker-options="timeOptions" :lang="lang" :shortcuts="shortcuts"></date-picker>
+      </b-card-text>
+      </center>
+    </b-card>
+    <br/>
+      <center><b-button v-on:click="display">Afficher le graph</b-button></center>
       <br/>
     <div class="graph" ref="chartdiv"></div>
 
@@ -34,11 +39,17 @@ import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 import moment from 'moment';
+import DatePicker from 'vue2-datepicker';
+import datetime from 'vuejs-datetimepicker';
 
 am4core.useTheme(am4themes_animated);
 
 export default {
     name: 'UserGraph',
+    components: {
+        DatePicker,
+        datetime
+    },
     data() {
         return {
             // FOR ROLES
@@ -57,6 +68,25 @@ export default {
 
             // FOR ALL
             userId: null,
+            start: null,
+            end: null,
+            shortcuts: [
+            {
+                text: 'OK',
+                onClick: () => {
+                this.start = [new Date()],
+                this.end = [new Date()]
+                }
+            }],
+            timeOptions: {
+                start: '',
+                step: '',
+                end: ''
+            },
+            lang: {
+                days: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+                months: ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jui', 'Jui', 'Aou', 'Sep', 'Oct', 'Nov', 'Dec'],
+            }            
         }
     },
     created() {
@@ -120,11 +150,7 @@ export default {
                 console.log(errors);
             })
         },
-
-    
-
         getMyUsers() {
-
             // GET ALL THE TEAMS
             axios.get('http://localhost:3000/api/teams', {
                 headers: {
@@ -206,7 +232,11 @@ export default {
         },
         update_data() {
             var self = this;
-            axios.get('http://localhost:3000/api/workingtimes/user/' +  this.userId, {
+            var query = "http://localhost:3000/api/workingtimes/user/" +  this.userId
+            if (this.start != null && this.end != null) {
+                query += `?start=${this.start}&end=${this.end}`;
+            }
+            axios.get(query, {
             headers: {Authorization: 'Bearer ' + localStorage.getItem('token')}
             })
             .then(function(result) {
@@ -241,7 +271,8 @@ export default {
     margin: 0 auto;
 }
 .graph {
-  width: 100%;
+  margin: auto;
+  width: 90%;
   height: 500px;
 }
 </style>

@@ -12,7 +12,18 @@
     </select>
 
     <br><br>
-    <center><button v-on:click="display">Afficher le graph</button></center>
+    <b-card bg-variant="light" text-variant="dark" border-variant="dark" title="Time Range">
+      <center>
+      <b-card-text>
+        Start: <date-picker format="YYYY-MM-DD HH:mm:ss" valueType="format" v-model="start" type="datetime" :time-picker-options="timeOptions" :lang="lang" :shortcuts="shortcuts"></date-picker>
+      </b-card-text>
+      <b-card-text>
+        End: <date-picker format="YYYY-MM-DD HH:mm:ss" valueType="format" v-model="end" type="datetime" :time-picker-options="timeOptions" :lang="lang" :shortcuts="shortcuts"></date-picker>
+      </b-card-text>
+      </center>
+    </b-card>
+    <br/>
+    <center><b-button v-on:click="display">Afficher le graphe</b-button></center>
     <br/>
     <div class="graph" ref="chartdiv"></div>
 
@@ -28,11 +39,17 @@ import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 import DashboardLayout from '@/pages';
 import moment from 'moment';
+import DatePicker from 'vue2-datepicker';
+import datetime from 'vuejs-datetimepicker';
 
 am4core.useTheme(am4themes_animated);
 
 export default {
   name: 'TeamGraph',
+  components: {
+    DatePicker,
+    datetime
+  },
   data() {
     return {
       admin: null,
@@ -44,7 +61,26 @@ export default {
       teamId: null,
       teamName: null,
       managerId: null,
-      nameTeam: null
+      nameTeam: null,
+      start: null,
+      end: null,
+      shortcuts: [
+      {
+        text: 'OK',
+        onClick: () => {
+          this.start = [new Date()],
+          this.end = [new Date()]
+        }
+      }],
+      timeOptions: {
+        start: '',
+        step: '',
+        end: ''
+      },
+      lang: {
+        days: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+        months: ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jui', 'Jui', 'Aou', 'Sep', 'Oct', 'Nov', 'Dec'],
+      }
     }
   },
   
@@ -131,7 +167,11 @@ export default {
   update_data() {
     var self = this;
     var graphData = [];
-    axios.get('http://localhost:3000/api/workingtimes/team/' +  this.teamId, {
+    var query = "http://localhost:3000/api/workingtimes/team/" +  this.teamId
+    if (this.start != null && this.end != null) {
+      query += `?start=${this.start}&end=${this.end}`;
+    }
+    axios.get(query, {
       headers: {Authorization: 'Bearer ' + localStorage.getItem('token')}
     })
     .then(function(result) {
@@ -149,16 +189,14 @@ export default {
     var end = moment(obj.end);
     dailyHours += end.diff(start, 'hours');
     if (data[index+1] == undefined || !(moment(data[index+1].start).isSame(start, 'day'))) {
-    graphData.push({
-      date: `${start.year().toString()}-${(start.month() + 1).toString()}-${start.date().toString()}`,
-      hours: dailyHours / employees.length
-    });
-    dailyHours = 0;
+      graphData.push({
+        date: `${start.year().toString()}-${(start.month() + 1).toString()}-${start.date().toString()}`,
+        hours: dailyHours / employees.length
+      });
+      dailyHours = 0;
     }
     }
-    })
-    .then(() => {
-      self.chart.data = graphData
+    self.chart.data = graphData
     })
   }
   }
@@ -172,7 +210,8 @@ export default {
   margin: 0 auto;
 }
 .graph {
-  width: 100%;
+  margin: auto;
+  width: 90%;
   height: 500px;
 }
 </style>

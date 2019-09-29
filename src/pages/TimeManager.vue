@@ -1,17 +1,17 @@
 <template>
     <div>
         <p> <b>&nbsp;&nbsp;&nbsp;{{ today }}</b></p>
-        <center><b-jumbotron header="Pointez" lead="Pensez à pointer à votre arrivé, et dès votre départ" class="center" border-variant="dark"><br>
+        <center><b-jumbotron header="Pointez" lead="Pensez à pointer à votre arrivée, et dès votre départ." class="center" border-variant="dark"><br>
             <b-button variant="primary" v-on:click="postClock" v-if="!statusClock">Démarrer</b-button>
             <b-button variant="primary" v-on:click="postClock" v-if="statusClock">{{chrono}} | stop</b-button><br><br>
             <b><span class="float-left">Arrivé(e): {{ arrival }}</span></b><b><span class="float-right">Parti(e): {{ departure }}</span></b>
         </b-jumbotron></center><br><br>
         <b-card bg-variant="light" text-variant="dark" border-variant="dark" title="Récapitulatif horaire d'aujourd'hui">
             <b-card-text>
-                Arrivé(e): <date-picker format="DD/MM/YYYY HH:mm:ss" valueType="format" v-model="setArrival" type="datetime" :time-picker-options="timeOptions" :lang="lang" :shortcuts="shortcuts"></date-picker>
+                Arrivé(e): <date-picker format="YYYY-MM-DD HH:mm:ss" valueType="format" v-model="setArrival" type="datetime" :time-picker-options="timeOptions" :lang="lang" :shortcuts="shortcuts"></date-picker>
             </b-card-text>
             <b-card-text>
-                Parti(e): <date-picker format="DD/MM/YYYY HH:mm:ss" valueType="format" v-model="setDeparture" type="datetime" :time-picker-options="timeOptions" :lang="lang" :shortcuts="shortcuts"></date-picker>
+                Parti(e): <date-picker format="YYYY-MM-DD HH:mm:ss" valueType="format" v-model="setDeparture" type="datetime" :time-picker-options="timeOptions" :lang="lang" :shortcuts="shortcuts"></date-picker>
             </b-card-text>
             <center><b-button href="#" variant="primary" v-on:click="setWorkingTime">Mettez à jours vos horaires</b-button></center>
         </b-card>
@@ -128,7 +128,7 @@ export default {
                 })
 
                 clearInterval(this.interval);
-                Swal.fire("Vous avez travaillez " + this.finalChrono + " aujourd'hui");
+                Swal.fire("Vous avez travaillé " + this.finalChrono);
             }
 
         },
