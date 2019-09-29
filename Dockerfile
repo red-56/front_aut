@@ -12,6 +12,10 @@ COPY package.json .
 # installe les dépendances du projet
 RUN npm install
 
+RUN apk add --no-cache tzdata
+
+ENV TZ Europe/Paris
+
 # copie les fichiers et dossiers du projet dans le dossier de travail (par exemple : le dossier 'app')
 COPY . .
 
