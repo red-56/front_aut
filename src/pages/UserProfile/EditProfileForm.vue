@@ -151,7 +151,8 @@ export default {
 
     remove() {
       // CAS ADMIN
-      if (jwt_decode(localStorage.getItem('token')).id == 1) {
+      var token = localStorage.getItem('token');
+      if (jwt_decode(token).id == 1) {
         Swal.fire({
           type: 'error',
           title: 'Oops...',
@@ -160,7 +161,7 @@ export default {
         return;
       }
 
-      if (jwt_decode(localStorage.getItem('token')).id != 1 && this.password == null) {
+      if (jwt_decode(token).id != 1 && this.password == null) {
         Swal.fire({
           type: 'error',
           title: 'Erreur',
@@ -170,9 +171,9 @@ export default {
         return;
       }
       
-      axios.delete('http://localhost:3000/api/users/', jwt_decode(localStorage.getItem('token')).id, {
+      axios.delete('http://localhost:3000/api/users/' + jwt_decode(token).id, {
         headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token')
+          Authorization: 'Bearer ' + token
         }
       })
       .then((resp) => {
