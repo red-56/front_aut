@@ -24,8 +24,8 @@
     <br><br><br>
 
     <select v-if="manager" id="listTeams">
-      <option>Choisissez un employé à ajouter dans l'équipe choisie</option>
-      <option v-for="employee in myEmployeesInfo" :key="employee.id" :value="employee.id" v-on:click="selectedValueMyEmployee">{{ employee.first_name }} {{ employee.last_name }} /{{ employee.role }}</option>
+      <option>Choisissez un employé à ajouter/supprimer dans/de l'équipe choisie</option>
+      <option v-for="employee in myEmployeesInfoUniques" :key="employee.id" :value="employee.id" v-on:click="selectedValueMyEmployee">{{ employee.first_name }} {{ employee.last_name }} /{{ employee.role }}</option>
     </select>
 
     <!-- For editing team -->
@@ -40,9 +40,13 @@
     <br>
     <br>
     <center>
-      <button v-on:click="addTo">Ajouter à</button>&nbsp;&nbsp;&nbsp;
-      <button v-on:click="removeFrom">Supprimer de:</button>&nbsp;&nbsp;&nbsp;
-      <button v-b-modal.edit-team>Editer une équipe</button>
+        <!-- ADMIN -->
+      <button v-on:click="addTo" v-if="admin">Ajouter à</button>&nbsp;&nbsp;&nbsp;
+      <button v-on:click="removeFrom" v-if="admin">Supprimer de:</button>&nbsp;&nbsp;&nbsp;
+      <!-- MANAGER -->
+      <button v-on:click="addTo" v-if="manager">Ajouter à</button>&nbsp;&nbsp;&nbsp;
+      <button v-on:click="removeFrom" v-if="manager">Supprimer de:</button>&nbsp;&nbsp;&nbsp;
+      <button v-b-modal.edit-team >Editer une équipe</button>
     </center>
   </div>
 </template>
@@ -72,6 +76,7 @@ export default {
       myTeams: [],
       myEmployees: [],
       myEmployeesInfo: [],
+      myEmployeesInfoUniques: [],
       myEmployeeId: null,
       myTeamId: null,
 
@@ -161,12 +166,58 @@ export default {
             this.teams = response.data;
           } else if (this.manager) {
             this.teams = response.data;
+
             for (var i = 0; i < this.teams.length; i++) {
               if (this.teams[i].managerId == jwt_decode(localStorage.getItem("token")).id) {
                 this.myTeams.push(this.teams[i]);
               }
             }
           }
+
+            for (var j = 0; j < this.myTeams.length; j++) {
+                    axios.get('http://localhost:3000/api/teamscontent/team/' + this.myTeams[j].id, {
+                        headers: {
+                            Authorization: 'Bearer ' + localStorage.getItem('token')
+                        }
+                    })
+                    .then((resp) => {
+                        this.myEmployees = resp.data;
+
+        
+                        
+                        if (this.myEmployees.length == 0) {
+                            console.log("team vide");
+                        } else {
+                            for (var k = 0; k < this.myEmployees.length; k++) {
+                                if (this.myEmployees[k].employeeId != jwt_decode(localStorage.getItem('token')).id && 
+                                this.myEmployeesInfo.includes(this.myEmployees[k].employeeId) == false) {
+                                     this.myEmployeesInfo.push(this.myEmployees[k].employeeId);
+                                }
+                            }
+                        }
+
+                        
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            }
+
+            for (var l = 0; l < this.myEmployeesInfo.length; l++){
+                    axios.get('http://localhost:3000/api/users/' + this.myEmployeesInfo[l], {
+                        headers: {
+                            Authorization: 'Bearer ' + localStorage.getItem('token')
+                        }
+                    })
+                    .then((resp) => {
+                        this.myEmployeesInfoUniques.push(resp.data);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+                }
+
+
         })
         .catch(error => {
           console.log(error);
@@ -184,8 +235,6 @@ export default {
                 }
             })
             .then((response) => {
-                console.log(response.data);
-                console.log('TEAM CHOISIE' + this.teamId);
 
                 this.members = response.data;
 
@@ -226,8 +275,6 @@ export default {
                 }
             })
             .then((response) => {
-                console.log(response.data);
-                console.log('TEAM CHOISIE' + this.myTeamId);
 
                 this.members = response.data;
 
@@ -347,6 +394,7 @@ export default {
                 })
                 .then((response) => {
                     this.nameofTeam = response.data.name;
+                    this.teamName = this.nameofTeam
                 })
                 .catch((error) => {
                     console.log(error);
@@ -359,13 +407,14 @@ export default {
                 })
                 .then((response) => {
                     this.nameofTeam = response.data.name;
+                    this.teamName = this.nameofTeam
                 })
                 .catch((error) => {
                     console.log(error);
                 });
             }
 
-            this.teamName = this.nameofTeam
+            
         },
 
         handleOk(bvModalEvt) {

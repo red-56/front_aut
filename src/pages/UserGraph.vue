@@ -7,12 +7,12 @@
         </select>
         
 
-      <!-- CASE MANAGER 
+      <!-- CASE MANAGER  -->
 
         <select v-if="manager" id="listUsers">
             <option>Choisissez un utilisateur</option>
-            <option v-for="user in myUsersInfo" :key="user.id" :value="user.id" v-on:click="selectedValue">{{ user.first_name }} / {{ user.last_name }} / {{ user.role }}</option>
-        </select>-->
+            <option v-for="user in myUsersInfoUnique" :key="user.id" :value="user.id" v-on:click="selectedValue">{{ user.first_name }} / {{ user.last_name }} / {{ user.role }}</option>
+        </select>
 
       
 
@@ -53,6 +53,7 @@ export default {
             myTeams: [],
             myUsers: [],
             myUsersInfo: [],
+            myUsersInfoUnique: [],
 
             // FOR ALL
             userId: null,
@@ -119,30 +120,91 @@ export default {
                 console.log(errors);
             })
         },
+<<<<<<< HEAD
+=======
+
+    
+
+>>>>>>> 5bca723515d387b3a3777dec5620dfed8e5efe60
         getMyUsers() {
-            // GET ALL TEAMS
+
+            // GET ALL THE TEAMS
             axios.get('http://localhost:3000/api/teams', {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
                 }
             })
-            .then(response => {
-                this.allTeams.push(response.data)
-            })
-            .catch(errors => {
-                console.log(errors);
-            });
+            .then((response) => {
+                this.allTeams = response.data;
 
-            console.log(this.allTeams);
-
-            // GET MY TEAMS
-            for(var i = 0; i < this.allTeams; i++) {
-                if (this.allTeams[i].managerId == jwt_decode(localStorage.getItem('token')).id) {
-                    this.myTeams.push(this.allTeams[i]);
+                // GET MY TEAMS ONLY
+                for (var i = 0; i < this.allTeams.length; i++) {
+                    if (this.allTeams[i].managerId == jwt_decode(localStorage.getItem('token')).id) {
+                        this.myTeams.push(this.allTeams[i]);
+                    }
                 }
+
+                // GET MY USERS
+                for (var j = 0; j < this.myTeams.length; j++) {
+                    axios.get('http://localhost:3000/api/teamscontent/team/' + this.myTeams[j].id, {
+                        headers: {
+                            Authorization: 'Bearer ' + localStorage.getItem('token')
+                        }
+                    })
+                    .then((resp) => {
+                        this.myUsers = resp.data;
+
+        
+                        
+                        if (this.myUsers.length == 0) {
+                            console.log("team vide");
+                        } else {
+                            for (var k = 0; k < this.myUsers.length; k++) {
+                                if (this.myUsers[k].employeeId != jwt_decode(localStorage.getItem('token')).id && 
+                                this.myUsersInfo.includes(this.myUsers[k].employeeId) == false) {
+                                     this.myUsersInfo.push(this.myUsers[k].employeeId);
+                                }
+                            }
+                        }
+
+                        
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+                }
+<<<<<<< HEAD
             }
             // CONSOLE MY TEAMS
             console.log(this.myTeams);
+=======
+                
+
+                for (var l = 0; l < this.myUsersInfo.length; l++){
+                    axios.get('http://localhost:3000/api/users/' + this.myUsersInfo[l], {
+                        headers: {
+                            Authorization: 'Bearer ' + localStorage.getItem('token')
+                        }
+                    })
+                    .then((resp) => {
+                        this.myUsersInfoUnique.push(resp.data);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+                }
+
+                
+               
+                
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+            
+
+>>>>>>> 5bca723515d387b3a3777dec5620dfed8e5efe60
         },
         display() {
             if (this.userId == null) {

@@ -83,7 +83,6 @@ export default {
                 this.statusClock = true;
                 const now = moment.now();
                 this.arrival = moment().toISOString().substring(0, moment().toISOString().length -1)
-                this.setArrival = this.arrival
                 this.clocks = {
                     status: true,
                     time: moment().toISOString().substring(0, moment().toISOString().length -1)
@@ -111,7 +110,6 @@ export default {
                 this.chrono = null;
                 this.statusClock = false;
                 this.departure = moment().toISOString().substring(0, moment().toISOString().length -1);
-                this.setDeparture = this.departure;
                    this.clocks = {
                     status: false,
                     time: moment().toISOString().substring(0, moment().toISOString().length -1)
@@ -147,11 +145,13 @@ export default {
                 return;
             }
 
-            if (this.setArrival != null && this.setDeparture != null) {
+            if (this.statusClock == false && this.setArrival != null && this.setDeparture != null) {
+
+                console.log('coucou');
 
                 this.clocks = {
                     status: true,
-                    time: moment().toISOString().substring(0, moment().toISOString().length -1)
+                    time: this.setArrival
                 }
 
                 // SET L ARRIVEE
@@ -169,7 +169,7 @@ export default {
 
                 this.clocks = {
                     status: false,
-                    time: moment().toISOString().substring(0, moment().toISOString().length -1)
+                    time: this.setDeparture
                 }
 
                 // SET LE DEPART
@@ -188,6 +188,7 @@ export default {
             } else {
                 alert('Rien à mettre à jour');
             }
+
         }
     }
 
