@@ -47,6 +47,10 @@ export default {
     
   },
 
+  created() {
+    localStorage.removeItem('token');
+  },
+
   methods: {
 
     login() {
