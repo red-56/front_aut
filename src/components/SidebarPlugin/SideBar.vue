@@ -57,7 +57,7 @@ export default {
   methods: {
       getInfo() {
       
-      axios.get('http://localhost:3000/api/users/' + jwt_decode(localStorage.getItem('token')).id, {
+      axios.get('https://timepool.me:3001/api/users/' + jwt_decode(localStorage.getItem('token')).id, {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('token')
         }

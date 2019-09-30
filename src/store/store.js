@@ -29,7 +29,7 @@ export default new Vuex.Store({
 
     login({commit}, user){
       commit('loginStart')
-      axios({url: 'http://localhost:3000/api/users/sign_in', data: user, method: 'POST' })
+      axios({url: 'https://timepool.me:3001/api/users/sign_in', data: user, method: 'POST' })
       .then(resp => {
         localStorage.setItem('token', resp.data.token)
         commit('loginStop', null)

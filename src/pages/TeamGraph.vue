@@ -135,7 +135,7 @@ export default {
       }
     },
     getTeams() {
-      axios.get('http://localhost:3000/api/teams', {
+      axios.get('https://timepool.me:3001/api/teams', {
           headers: {
             Authorization: 'Bearer ' + localStorage.getItem('token')
           }
@@ -171,7 +171,7 @@ export default {
   update_data() {
     var self = this;
     var graphData = [];
-    var query = "http://localhost:3000/api/workingtimes/team/" +  this.teamId
+    var query = "https://timepool.me:3001/api/workingtimes/team/" +  this.teamId
     if (this.start != null && this.end != null) {
       query += `?start=${this.start}&end=${this.end}`;
     }

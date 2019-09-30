@@ -54,7 +54,7 @@ export default {
   methods: {
 
     login() {
-      axios.post('http://localhost:3000/api/users/sign_in', {email: this.email, password: this.password})
+      axios.post('https://timepool.me:3001/api/users/sign_in', {email: this.email, password: this.password})
       .then((token) => {
         localStorage.setItem('token', token.data.token);
         this.$router.push('/d/dashboard');

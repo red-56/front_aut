@@ -61,7 +61,7 @@ export default {
           confirmButtonText: 'Réessayez'
         });
       } else {
-        axios.post('http://localhost:3000/api/users/sign_up', {
+        axios.post('https://timepool.me:3001/api/users/sign_up', {
         first_name: this.first_name,
         last_name: this.last_name,
         email: this.email,

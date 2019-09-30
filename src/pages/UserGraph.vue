@@ -135,7 +135,7 @@ export default {
             this.myUsersInfoUnique = [];
             this.teamId = e.target.value;
 
-            axios.get('http://localhost:3000/api/teamscontent/team/' + this.teamId, {
+            axios.get('https://timepool.me:3001/api/teamscontent/team/' + this.teamId, {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
                 }
@@ -144,7 +144,7 @@ export default {
                 this.myUsers = response.data;
                 
                 for (var i = 0; i < this.myUsers.length; i++) {
-                    axios.get('http://localhost:3000/api/users/' + this.myUsers[i].employeeId, {
+                    axios.get('https://timepool.me:3001/api/users/' + this.myUsers[i].employeeId, {
                         headers: {
                             Authorization: 'Bearer ' + localStorage.getItem('token')
                         }
@@ -175,7 +175,7 @@ export default {
         },
 
         getUsers() {
-            axios.get('http://localhost:3000/api/users', {
+            axios.get('https://timepool.me:3001/api/users', {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
                 }
@@ -190,7 +190,7 @@ export default {
         },
         getMyTeams() {
             // GET ALL THE TEAMS
-            axios.get('http://localhost:3000/api/teams', {
+            axios.get('https://timepool.me:3001/api/teams', {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
                 }
@@ -225,7 +225,7 @@ export default {
 
         update_data() {
             var self = this;
-            var query = "http://localhost:3000/api/workingtimes/user/" +  this.userId
+            var query = "https://timepool.me:3001/api/workingtimes/user/" +  this.userId
             if (this.start != null && this.end != null) {
                 query += `?start=${this.start}&end=${this.end}`;
             }

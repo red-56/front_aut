@@ -90,7 +90,7 @@ export default {
       update_data() {
       var token = localStorage.getItem('token')
       var self = this;
-      var query = "http://localhost:3000/api/workingtimes/user/" +  jwt_decode(token).id
+      var query = "https://timepool.me:3001/api/workingtimes/user/" +  jwt_decode(token).id
       if (this.start != null && this.end != null) {
           query += `?start=${this.start}&end=${this.end}`;
       }

@@ -59,7 +59,7 @@ export default {
         },
 
         getUsersAndManagers() {
-            axios.get('http://localhost:3000/api/users', {headers: {
+            axios.get('https://timepool.me:3001/api/users', {headers: {
                 Authorization: 'Bearer ' + this.token
             }}).then((response) => {
                 // RETRIEVE USERS
@@ -88,7 +88,7 @@ export default {
                 confirmButtonText: 'Oui supprimer'
                 }).then((result) => {
                 if (result.value) {
-                    axios.delete('http://localhost:3000/api/users/' + id, {
+                    axios.delete('https://timepool.me:3001/api/users/' + id, {
                         headers: {
                             Authorization: 'Bearer ' + localStorage.getItem('token')
                         }
@@ -118,7 +118,7 @@ export default {
                     text: first_name + ' est déjà Manager'
                 });
             } else {
-                axios.patch('http://localhost:3000/api/users/' + id, {role: 'Manager'}, {
+                axios.patch('https://timepool.me:3001/api/users/' + id, {role: 'Manager'}, {
                     headers: {
                         Authorization: 'Bearer ' + localStorage.getItem('token')
                     }   

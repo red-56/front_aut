@@ -88,7 +88,7 @@ export default {
     
     fetchData() {
       
-      axios.get('http://localhost:3000/api/users/' + jwt_decode(localStorage.getItem('token')).id, {
+      axios.get('https://timepool.me:3001/api/users/' + jwt_decode(localStorage.getItem('token')).id, {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('token')
         }
@@ -124,7 +124,7 @@ export default {
           this.user.password = this.password;
           this.user.email = this.email;
 
-          axios.put('http://localhost:3000/api/users/' + jwt_decode(localStorage.getItem('token')).id, this.user, {
+          axios.put('https://timepool.me:3001/api/users/' + jwt_decode(localStorage.getItem('token')).id, this.user, {
             headers: {
               Authorization: 'Bearer ' + localStorage.getItem('token')
             }
@@ -171,7 +171,7 @@ export default {
         return;
       }
       
-      axios.delete('http://localhost:3000/api/users/' + jwt_decode(token).id, {
+      axios.delete('https://timepool.me:3001/api/users/' + jwt_decode(token).id, {
         headers: {
           Authorization: 'Bearer ' + token
         }

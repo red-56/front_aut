@@ -108,7 +108,7 @@ export default {
     },
 
     getTeams() {
-        axios.get('http://localhost:3000/api/teams', {
+        axios.get('https://timepool.me:3001/api/teams', {
             headers: {
                 Authorization: 'Bearer ' + localStorage.getItem('token')
             }
@@ -133,7 +133,7 @@ export default {
     },
 
     getEmployeesAndManagers() {
-        axios.get('http://localhost:3000/api/users', {
+        axios.get('https://timepool.me:3001/api/users', {
             headers: {
                 Authorization: 'Bearer ' + localStorage.getItem('token')
             }
@@ -172,7 +172,7 @@ export default {
     addTeam() {
 
         if (this.teamName != null && this.managerId != null) {
-            axios.post('http://localhost:3000/api/teams', {name: this.teamName, managerId: this.managerId}, {
+            axios.post('https://timepool.me:3001/api/teams', {name: this.teamName, managerId: this.managerId}, {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
                 }
@@ -203,7 +203,7 @@ export default {
         } else {
 
             // AVOIR LES EQUIPES A LAQUELLE APPARTIENT L EMPLOYE CHOISI
-            axios.get('http://localhost:3000/api/teamscontent/user/' + id, {
+            axios.get('https://timepool.me:3001/api/teamscontent/user/' + id, {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
                 }
@@ -218,7 +218,7 @@ export default {
                 }
 
             if (!this.exists) {
-                axios.post('http://localhost:3000/api/teamscontent', {teamId: this.teamId, employeeId: id}, {
+                axios.post('https://timepool.me:3001/api/teamscontent', {teamId: this.teamId, employeeId: id}, {
                     headers: {
                         Authorization: 'Bearer ' + localStorage.getItem('token')
                     }
@@ -261,7 +261,7 @@ export default {
             alert('Aucune équipe choisie');
         } else {
             // AVOIR LES EQUIPES A LAQUELLE APPARTIENT L EMPLOYE CHOISI
-            axios.get('http://localhost:3000/api/teamscontent/user/' + id, {
+            axios.get('https://timepool.me:3001/api/teamscontent/user/' + id, {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('token')
                 }
@@ -276,7 +276,7 @@ export default {
                 }
 
             if (this.exists) {
-                axios.delete('http://localhost:3000/api/teamscontent/team/' + this.teamId + '/user/' + id, {
+                axios.delete('https://timepool.me:3001/api/teamscontent/team/' + this.teamId + '/user/' + id, {
                     headers: {
                         Authorization: 'Bearer ' + localStorage.getItem('token')
                     }

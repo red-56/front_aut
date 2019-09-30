@@ -88,7 +88,7 @@ export default {
                     time: moment().toISOString().substring(0, moment().toISOString().length -1)
                 };
 
-                axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id,  this.clocks, {
+                axios.patch('https://timepool.me:3001/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id,  this.clocks, {
                     headers: {
                         Authorization: 'Bearer ' + localStorage.getItem('token')
                     }
@@ -115,7 +115,7 @@ export default {
                     time: moment().toISOString().substring(0, moment().toISOString().length -1)
                 };
 
-                axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id,  this.clocks, {
+                axios.patch('https://timepool.me:3001/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id,  this.clocks, {
                     headers: {
                         Authorization: 'Bearer ' + localStorage.getItem('token')
                     }
@@ -163,7 +163,7 @@ export default {
                 }
 
                 // SET L ARRIVEE
-                axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id, this.clocks, {
+                axios.patch('https://timepool.me:3001/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id, this.clocks, {
                     headers: {
                             Authorization: 'Bearer ' + localStorage.getItem('token')
                     }
@@ -176,7 +176,7 @@ export default {
                     }
 
                     // SET LE DEPART
-                    axios.patch('http://localhost:3000/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id, this.clocks, {
+                    axios.patch('https://timepool.me:3001/api/clocks/user/' + jwt_decode(localStorage.getItem('token')).id, this.clocks, {
                         headers: {
                             Authorization: 'Bearer ' + localStorage.getItem('token')
                         }
