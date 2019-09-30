@@ -12,9 +12,9 @@
             <div class="col">
                 <br>
                 <p class="text-center">L'affecter à un manager</p>
-                <select id="listManagers" required>
+                <select v-on:change="selectedValueManager($event)" id="listManagers" required>
                     <option>Choisissez un manager</option>
-                    <option v-for="manager in managers" :key="manager.id" :value="manager.id" v-on:click="selectedValueManager">{{ manager.first_name }} {{ manager.last_name }}</option>
+                    <option v-for="manager in managers" :key="manager.id" :value="manager.id" >{{ manager.first_name }} {{ manager.last_name }}</option>
                 </select>
             </div>
       </div>
@@ -43,9 +43,9 @@
                 <td>
                     <button v-on:click="addToTeam(employee.id)">Ajouter à</button> | 
                     <button v-on:click="removeFromTeam(employee.id)">Supprimer de </button> |
-                    <select>
+                    <select v-on:change="selectedValueTeam($event)"> 
                         <option>Choisissez une équipe</option>
-                        <option v-for="team in teams" :key="team.id" :value="team.id" v-on:click="selectedValueTeam">{{ team.name }}</option>
+                        <option v-for="team in teams" :key="team.id" :value="team.id" >{{ team.name }}</option>
                     </select>
                 </td>
             </tr>
@@ -164,6 +164,7 @@ export default {
     },
 
     selectedValueManager(e) {
+        console.log(e.target.value);
         this.managerId = e.target.value;
     },
 
@@ -172,7 +173,6 @@ export default {
     },
 
     addTeam() {
-
         if (this.teamName != null && this.managerId != null) {
             axios.post('https://timepool.me:3001/api/teams', {name: this.teamName, managerId: this.managerId}, {
                 headers: {

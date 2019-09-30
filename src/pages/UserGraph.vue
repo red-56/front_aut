@@ -1,19 +1,19 @@
 <template>
     <div>
-        <select id="listTeams" v-if="admin">
+        <select v-on:change="selectedValue($event)" id="listTeams" v-if="admin">
             <option>Choisissez un utilisateur</option>
-            <option v-for="user in users" :key="user.id" :value="user.id" v-on:click="selectedValue">{{ user.last_name }} / {{ user.first_name }} /  {{ user.role }}</option>
+            <option v-for="user in users" :key="user.id" :value="user.id" >{{ user.last_name }} / {{ user.first_name }} /  {{ user.role }}</option>
         </select>
 
       <!-- CASE MANAGER  -->
-        <select id="listTeams" v-if="manager">
+        <select v-on:change="selectedValueTeam($event)" id="listTeams" v-if="manager">
             <option>Choisissez une équipe</option>
-            <option v-for="team in myTeams" :key="team.id" :value="team.id" v-on:click="selectedValueTeam">{{ team.name }}</option>
+            <option v-for="team in myTeams" :key="team.id" :value="team.id" >{{ team.name }}</option>
         </select>
         <br><br>
-        <select id="listUsers" v-if="manager">
+        <select v-on:change="selectedValueM($event)" id="listUsers" v-if="manager">
             <option>Choisissez un utilisateur</option>
-            <option v-for="user in myUsersInfoUnique" :key="user.id" :value="user.id" v-on:click="selectedValueM">{{ user.first_name }} / {{ user.last_name }} / {{ user.role }}</option>
+            <option v-for="user in myUsersInfoUnique" :key="user.id" :value="user.id" >{{ user.first_name }} / {{ user.last_name }} / {{ user.role }}</option>
         </select>
         <br>
 
