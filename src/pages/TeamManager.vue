@@ -12,7 +12,7 @@
             <div class="col">
                 <br>
                 <p class="text-center">L'affecter à un manager</p>
-                <select v-on:change="selectedValueManager($event)" id="listManagers" required>
+                <select class="custom-select custom-select-md" v-on:change="selectedValueManager($event)" id="listManagers" required>
                     <option>Choisissez un manager</option>
                     <option v-for="manager in managers" :key="manager.id" :value="manager.id" >{{ manager.first_name }} {{ manager.last_name }}</option>
                 </select>
@@ -21,9 +21,9 @@
       <center><button class="btn btn-info mt-2" @click="addTeam" v-if="admin">Ajouter</button></center>
       <hr v-if="admin">
       <!-- FIN DE L'AJOUT D'UNE EQUIPE QUI CONCERNE L'ADMIN -->
-
-      <table class="table table-striped table-hover table-reponsive" style="widht: auto;">
-        <thead>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead class="thead-dark">
             <tr>
             <th scope="col">Id</th>
             <th scope="col">Nom</th>
@@ -41,8 +41,8 @@
                 <td>{{ employee.email }}</td>
                 <td>{{ employee.role }}</td>
                 <td>
-                    <button v-on:click="addToTeam(employee.id)">Ajouter à</button> | 
-                    <button v-on:click="removeFromTeam(employee.id)">Supprimer de </button> |
+                    <button class="btn btn-info btn-sm" v-on:click="addToTeam(employee.id)">Ajouter à</button> <b> | </b>
+                    <button class="btn btn-dark btn-sm" v-on:click="removeFromTeam(employee.id)">Supprimer de </button> <b> | </b>
                     <select v-on:change="selectedValueTeam($event)"> 
                         <option>Choisissez une équipe</option>
                         <option v-for="team in teams" :key="team.id" :value="team.id" >{{ team.name }}</option>
@@ -51,6 +51,7 @@
             </tr>
         </tbody>
       </table>
+    </div>
   </div>
 </template>
 

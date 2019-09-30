@@ -18,7 +18,7 @@
                 <td><b>{{ first_name }}</b></td>
                 <td><b>{{ email }}</b></td>
                 <td><b>{{ role }}</b></td>
-                <td><button v-on:click="promote(id, first_name, role)">Promouvoir</button> | <button v-on:click="deleting(id)">Supprimer</button></td>
+                <td><button class="btn btn-info btn-sm" v-on:click="promote(id, first_name, role)">Promouvoir</button> | <button class="btn btn-dark btn-sm" v-on:click="deleting(id)">Supprimer</button></td>
                 </tr>
             </tbody>
         </table>

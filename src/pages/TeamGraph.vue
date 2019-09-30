@@ -1,11 +1,11 @@
 <template>
   <div>
-    <select v-on:change="selectedValue($event)" v-if="admin" id="listTeams">
+    <select class="custom-select custom-select-md" v-on:change="selectedValue($event)" v-if="admin" id="listTeams">
         <option>Choisissez une équipe</option>
         <option v-for="team in myTeams" :key="team.id" :value="team.id" >{{ team.name }}</option>
     </select>
 
-    <select v-on:change="selectedValue($event)" v-if="manager" id="listTeams">
+    <select class="custom-select custom-select-md" v-on:change="selectedValue($event)" v-if="manager" id="listTeams">
         <option>Choisissez une équipe</option>
         <option v-for="team in myTeams" :key="team.id" :value="team.id" >{{ team.name }}</option>
     </select>
