@@ -202,6 +202,9 @@ export default {
     }
     self.chart.data = graphData
     })
+    .catch((error) => {
+      console.log(error);
+    });
   }
   }
 };
