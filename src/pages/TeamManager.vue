@@ -5,11 +5,13 @@
       <hr v-if="admin">
       <div class="row" v-if="admin">
             <div class="col">
-                <label>Nom de l'équipe</label>
-                <input type="text" class="form-control" v-model="teamName" required>
+                <p class="text-center">Nom de l'équipe</p>
+                <input type="text" class="form-control" v-model="teamName" placeholder="Saisir le nom de l'équipe" required>
             </div>
+            <div class="w-100"></div>
             <div class="col">
-                <label>L'affecter à un manager</label><br>
+                <br>
+                <p class="text-center">L'affecter à un manager</p>
                 <select id="listManagers" required>
                     <option>Choisissez un manager</option>
                     <option v-for="manager in managers" :key="manager.id" :value="manager.id" v-on:click="selectedValueManager">{{ manager.first_name }} {{ manager.last_name }}</option>
@@ -20,7 +22,7 @@
       <hr v-if="admin">
       <!-- FIN DE L'AJOUT D'UNE EQUIPE QUI CONCERNE L'ADMIN -->
 
-      <table class="table table-striped table-hover">
+      <table class="table table-striped table-hover table-reponsive" style="widht: auto;">
         <thead>
             <tr>
             <th scope="col">Id</th>

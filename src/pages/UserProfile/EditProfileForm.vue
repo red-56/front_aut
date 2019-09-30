@@ -76,7 +76,8 @@ export default {
       password: null,
       created_at: null,
       updated_at: null,
-      confirm_password: null
+      confirm_password: null,
+      canEdit: false,
     };
   },
 
@@ -119,12 +120,25 @@ export default {
         return;
       }
 
-      this.user.first_name = this.firstname;
-          this.user.last_name = this.lastname;
-          this.user.password = this.password;
-          this.user.email = this.email;
+      if (this.password != null) {
+        this.user.first_name = this.firstname;
+        this.user.last_name = this.lastname;
+        this.user.password = this.password;
+        this.user.email = this.email;
 
-          axios.put('https://timepool.me:3001/api/users/' + jwt_decode(localStorage.getItem('token')).id, this.user, {
+        // ################## POST FOR GET JWT ###################
+        axios.post('https://timepool.me:3001/api/users/sign_in', {email: this.email, password: this.password}, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('token')
+          }
+        })
+        .then((response) => {
+          if (response.data.token == null) {
+            alert('Mot de passe incorrect');
+            this.password = null;
+            return;
+          } else {
+            axios.put('https://timepool.me:3001/api/users/' + jwt_decode(localStorage.getItem('token')).id, this.user, {
             headers: {
               Authorization: 'Bearer ' + localStorage.getItem('token')
             }
@@ -146,18 +160,27 @@ export default {
             });
             console.log(e);
           })
-
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+        // #################### END OF POST ######################
+      }
+        this.password = null;   
     },
 
     remove() {
       // CAS ADMIN
       var token = localStorage.getItem('token');
+
       if (jwt_decode(token).id == 1) {
         Swal.fire({
           type: 'error',
           title: 'Oops...',
           text: 'Vous ne pouvez pas supprimer votre compte, vous êtes Administrateur!'
         })
+        this.password = null;
         return;
       }
 
@@ -170,26 +193,44 @@ export default {
         });
         return;
       }
-      
-      axios.delete('https://timepool.me:3001/api/users/' + jwt_decode(token).id, {
-        headers: {
-          Authorization: 'Bearer ' + token
-        }
-      })
-      .then((resp) => {
-        Swal.fire(
-          'Supprimé',
-          'Votre compte a bien été supprimé',
-          'success'
-        )
-        localStorage.removeItem('token');
-        router.push('/login');
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+
+      // ############### POST TO VERIFY IF EXISTS ################
+      if (jwt_decode(token).id != 1 && this.password != null) {
+        axios.post('https://timepool.me:3001/api/users/sign_in', {email: this.email, password: this.password}, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('token')
+          }
+        })
+        .then((response) => {
+          if (response.data.token == null) {
+            this.password = null;
+            return;
+          } else {
+            axios.delete('https://timepool.me:3001/api/users/' + jwt_decode(token).id, {
+              headers: {
+                Authorization: 'Bearer ' + token
+              }
+            })
+            .then((resp) => {
+              Swal.fire(
+                'Supprimé',
+                'Votre compte a bien été supprimé',
+                'success'
+              )
+              localStorage.removeItem('token');
+              router.push('/login');
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      }
     }
   }
-};
+}
 
 </script>

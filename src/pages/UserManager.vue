@@ -1,6 +1,6 @@
 <template>
     <div>
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover table-reponsive">
             <thead class="thead-dark">
                 <tr>
                 <th scope="col">Id</th>
