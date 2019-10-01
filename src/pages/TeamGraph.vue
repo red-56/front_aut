@@ -184,8 +184,8 @@ export default {
     var dailyHours = 0;
     var index, obj;
     data.forEach(obj => {
-    if (!(obj.employeeId in employees)) {
-    employees.push(obj.employeeId);
+    if (!(employees.includes(obj.employeeId))) {
+      employees.push(obj.employeeId);
     }
     });
     for (var [index, obj] of data.entries()) {
